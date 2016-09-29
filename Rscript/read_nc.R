@@ -2,7 +2,7 @@
 
 library("ncdf4")
 
-
+# test
 path  <- "/uio/hume/student-u88/aasmunba/Master-project/OUTPUT"
 
 files <- list.files(path=path, pattern="PREP_OFFLINE*",full.name=T) # test if nc maby
