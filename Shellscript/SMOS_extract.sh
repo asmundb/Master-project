@@ -7,6 +7,10 @@
 
 files=( `ls -d -1 $PWD/**/**/**/**/**/**/**/**/*` )
 
+if [ ! -d $PWD/nc ]; then
+  mkdir nc
+fi
+
 for f in ${files[@]};
 do 
   tar -xf $f --wildcards --no-anchored '*.nc' -C $PWD/nc/ || exit 1
