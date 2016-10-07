@@ -15,7 +15,7 @@ nfiles<- length(files)
 vars <- c("Soil_Moisture")
 nvars<- length(vars)
 
-# read ncfile
+# read ncfile and extract variables
 
 ncid    <- nc_open(files)
 
@@ -30,17 +30,13 @@ Soil_moisture <- ncvar_get(ncid, ncid$var[[vars]])
 nc_close(ncid)
 
 
-#for (i in 1:nfiles){
-#  ncid    <- nc_open(files[i])
-#  filename <- ncid$filename
-#  filename <- gsub(".*/","",filename)
-#  filename <- gsub("*.nc","",filename)
-#  dimnames(x)[[1]][i] <- filename
-#  for (j in 1:nvars){
-#    x[i,j,]    <- ncvar_get(ncid,ncid$var[[vars[j]]])
-#  }
-#  nc_close(ncid)
-#}
-#dimnames(x)[[2]] <- vars
+nn <- function(i,j,I,J){
+  # returns nearest neighbour
+  d <- outer((I-i)^2 , (J-j)^2)
+  x <- which(min(d) == d, arr.ind=T)
+  return(x)
+}
 
 
+
+write(SM_points, filename)
