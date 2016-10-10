@@ -5,14 +5,16 @@
 
 # extract ncfiles from tgz files
 
-files=( `ls -d -1 $PWD/**/**/**/**/**/**/**/**/*` )
+work="/disk1/asmundb/SMOS/"
+files=( `ls -d -1 $work/eftp.ifremer.fr/SM/GRIDDED/L3SM/RE04/MIR_CLF31D/**/**/*` )
 
-if [ ! -d $PWD/nc ]; then
+if [ ! -d $work/nc ]; then
   mkdir nc
 fi
 
 for f in ${files[@]};
 do 
-  tar -xf $f --wildcards --no-anchored '*.nc' -C $PWD/nc/ || exit 1
+  echo $f
+  tar -xf $f --wildcards --no-anchored '*.nc' -C $work/nc/ || exit 1
 done
 

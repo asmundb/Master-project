@@ -1,68 +1,84 @@
 # Read NetCDF files with SMOS data
 
 library("ncdf4")
-
-# parameters 
+source("functions.R")
 
 # coordinate pairs, model grid / station points
+# read from stationlist or something?
+npoints <- 2
+I      <- seq(from=11.04, to=11.4, length=npoints)   # longtitude
+J      <- seq(from=59.97, to=61.19, length=npoints)      # latitude
 
-I      <- c(11,10)  # lontitude
-J      <- c(60,59)  # latitude
 # check for pairity
 if (length(I) != length(J)) {
-  stop()
+  stop("lon and lat lengths differ")
 }
 
+# continue
 npoints <- length(I)
-
-# infile for SODA
-outfile <- "OBSERVATION_"
 
 
 # path to SMOS files
-#path  <- "/disk1/asmundb/SMOS/nc/"
-path <- "../Shellscript/nc/"
+# see Shellscripts/SMOS_extract.sh
+path  <- "/disk1/asmundb/SMOS/nc/"
+#path <- "../Shellscript/nc/"
 
 # files to open
+# should probably find a better way to run program
+# and list files ??
 files <- list.files(path=path, full.name=T) # test if nc mabye
-#files <- c(files, paste(path,"/PREP_SODA_EKF.nc",sep=""))
-#files <-  paste(path, "SM_OPER_MIR_CLF31A_20150820T000000_20150820T235959_300_001_7.DBL.nc",sep="")
+A_files <- files[grep(x=files, pattern="CLF31A")]
+D_files <- files[grep(x=files, pattern="CLF31D")]
 
-
-nfiles <- length(files)
+# number of days
+ndates <- length(A_files)
 
 # specify variable name
 vars   <- c("Soil_Moisture")
 nvars  <- length(vars)
 
-# read ncfile and extract variables
+#start loop
+l = 1
 
-ncid    <- nc_open(files)
+for (l in 1:ndates) {
 
-nlat    <- ncid$dim$lat$len
-nlon    <- ncid$dim$lon$len
+  ###################################
+  # read ncfile and extract variables
+  ncid_A    <- nc_open(A_files[l])
+  ncid_D    <- nc_open(D_files[l])
+  nlat    <- ncid_A$dim$lat$len
+  nlon    <- ncid_A$dim$lon$len
+  lat     <- ncid_A$dim$lat$vals
+  lon     <- ncid_A$dim$lon$vals
+  Soil_moisture_A <- ncvar_get(ncid_A, ncid_A$var[[vars]])
+  Soil_moisture_D <- ncvar_get(ncid_D, ncid_D$var[[vars]])
+  nc_close(ncid_A)
+  nc_close(ncid_D)
+  ###################################
 
-lat     <- ncid$dim$lat$vals
-lon     <- ncid$dim$lon$vals
+  ###################################
+  # find nearest neighbour and save value
+  SM_points_A <- array(0,dim=c(npoints))
+  SM_points_D <- array(0,dim=c(npoints))
+  SM_points   <- array(0,dim=c(npoints))
+  for (k in 1:npoints){
+  #  print(k)
+  #  print(nn(lon,lat,I[k],J[k]))
+  
+    SM_points_A[k] <- Soil_moisture_A[nn(lon,lat,I[k],J[k])]
+    SM_points_D[k] <- Soil_moisture_D[nn(lon,lat,I[k],J[k])]
+#    print(SM_points_A[k])
+#    print(SM_points_D[k])
+  }
+  ##################################
+  SM_points <- colMeans(rbind(SM_points_A,SM_points_D),na.rm=T)
 
-Soil_moisture <- ncvar_get(ncid, ncid$var[[vars]])
-
-nc_close(ncid)
-
-
-nn <- function(i,j,I,J){
-  # returns nearest neighbour
-  d <- outer((I-i)^2 , (J-j)^2)
-  x <- which(min(d) == d, arr.ind=T)
-  return(x)
+  # make input file for SODA
+  outpath <- paste(getwd(),"/../OBSERVATIONS_files/",sep="")
+  outfile <- "OBSERVATIONS_"
+  outfile_ending <- paste(regmatches(files[l], 
+                    regexpr("([0-9]{6})T([0-9]{2})", files[l])), sep="")
+  outfile_ending <- gsub(x=outfile_ending, pattern="T", replacement="H")
+  outfile <- paste(outpath, outfile, outfile_ending, ".DAT", sep="")
+  write(SM_points, outfile, ncolumns=1)
 }
-
-SM_points <- array(0,dim=c(npoints))
-for (k in 1:npoints){
-  print(k)
-  SM_points[k] <- Soil_moisture[nn(lon,lat,I[k],J[k])]
-}
-
-outfile <- paste(outfile,regmatches(files,regexpr("[0-9]{8}", files)),"00.dat",sep="")
-
-write(SM_points, outfile)
