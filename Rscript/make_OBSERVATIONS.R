@@ -11,7 +11,7 @@ source("functions.R")
 path    <- "/disk1/asmundb/SMOS/nc/"
 
 # path to save OBSERVATIONS_XXXXXXXX.DAT files (input in soda)
-#outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/2016/"
+outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/2016/"
 
 #####################################################################
 #####################################################################
@@ -33,7 +33,7 @@ npoints <- length(I)
 # files to open
 # should probably find a better way to run program
 # and list files ??                    "SM_RE04.*"
-files <- list.files(path=path, full.name=T) #test if nc mabye
+files <- list.files(path=path, pattern="SM_OPER.*", full.name=T) # test if nc mabye
 A_files <- files[grep(x=files, pattern="CLF31A")]
 D_files <- files[grep(x=files, pattern="CLF31D")]
 
@@ -45,17 +45,6 @@ vars   <- c("Soil_Moisture")
 nvars  <- length(vars)
 
 #start loop
-l=1
-
-ncid    <- nc_open(A_files[l])
-nlat    <- ncid_A$dim$lat$len
-nlon    <- ncid_A$dim$lon$len
-
-x <- array(0, dim=c(nlon,nlat))
-ones <- array(1, dim=c(nlon,nlat))
-
-
-pb <- txtProgressBar(min = 0, max = ndates, style = 3)
 for (l in 1:ndates) {
 
   ###################################
@@ -72,12 +61,26 @@ for (l in 1:ndates) {
   nc_close(ncid_D)
   ###################################
 
-#  x <- x + ones[which(!is.na(Soil_moisture_A), arr.ind=)] + ones[which(!is.na(Soil_moisture_D), arr.ind=T)]
-  
-  x[which(!is.na(Soil_moisture_A))] <- x[which(!is.na(Soil_moisture_A))] + 1
+  ###################################
+  # find nearest neighbour and save value
+  SM_points_A <- array(0,dim=c(npoints))  # up pass
+  SM_points_D <- array(0,dim=c(npoints))  # down pass
+  SM_points   <- array(0,dim=c(npoints))  # combined
+  # loop through points
+  for (k in 1:npoints){
+    SM_points_A[k] <- Soil_moisture_A[nn(lon,lat,I[k],J[k])]
+    SM_points_D[k] <- Soil_moisture_D[nn(lon,lat,I[k],J[k])]
+  }
+  ##################################
+  # average over up and down pass + minimize NAs
+  SM_points <- colMeans(rbind(SM_points_A,SM_points_D),na.rm=T)
 
-  setTxtProgressBar(pb, l)
+  # make input file for SODA
+  outfile <- "OBSERVATIONS_"
+  outfile_ending <- paste(regmatches(files[l], 
+                    regexpr("([0-9]{6})T([0-9]{2})", files[l])), sep="")
+  outfile_ending <- gsub(x=outfile_ending, pattern="T", replacement="H")
+  outfile <- paste(outpath, outfile, outfile_ending, ".DAT", sep="")
+  write(SM_points, outfile, ncolumns=1) #write to file
 }
-close(pb)
-
 # done 
