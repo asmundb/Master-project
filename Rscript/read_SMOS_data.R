@@ -80,4 +80,6 @@ for (l in 1:ndates) {
 }
 close(pb)
 
+x[which(x==0)] <- NA
+
 # done 

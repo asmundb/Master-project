@@ -33,6 +33,7 @@ npoints <- length(I)
 # files to open
 # should probably find a better way to run program
 # and list files ??                    "SM_RE04.*"
+
 files <- list.files(path=path, pattern="SM_OPER.*", full.name=T) # test if nc mabye
 A_files <- files[grep(x=files, pattern="CLF31A")]
 D_files <- files[grep(x=files, pattern="CLF31D")]
@@ -72,15 +73,20 @@ for (l in 1:ndates) {
     SM_points_D[k] <- Soil_moisture_D[nn(lon,lat,I[k],J[k])]
   }
   ##################################
-  # average over up and down pass + minimize NAs
-  SM_points <- colMeans(rbind(SM_points_A,SM_points_D),na.rm=T)
+
+  # missing values is 999
+  SM_points_A[which(is.na(SM_points_A))] <- 999
+  SM_points_D[which(is.na(SM_points_D))] <- 999
 
   # make input file for SODA
+  # Ascending satellite (A) at H06
+  # Descending ---||--- (D) at H18
+
   outfile <- "OBSERVATIONS_"
-  outfile_ending <- paste(regmatches(files[l], 
-                    regexpr("([0-9]{6})T([0-9]{2})", files[l])), sep="")
-  outfile_ending <- gsub(x=outfile_ending, pattern="T", replacement="H")
-  outfile <- paste(outpath, outfile, outfile_ending, ".DAT", sep="")
-  write(SM_points, outfile, ncolumns=1) #write to file
+  yymmdd <- substr(strsplit(strsplit(A_files[l],split="/")[[1]][7], split="_")[[1]][5],3,8)
+  out_A <- paste(outpath, outfile, yymmdd,"H06", ".DAT", sep="")
+  out_D <- paste(outpath, outfile, yymmdd,"H18", ".DAT", sep="")
+  write(SM_points_A, out_A, ncolumns=1) #write to file
+  write(SM_points_D, out_D, ncolumns=1) 
 }
 # done 
