@@ -36,3 +36,17 @@ get_var_TXT <- function(files){
   }
   return(x)
 }
+
+#### coords_from_stlist ####
+coords_from_stlist <- function(stationlist){
+  # Read coordinates from stationlist.cfg file
+  #
+  #
+  x = read.table("stationlist.cfg",header=F,skip=1,comment.char="#")
+  lon = x$V4
+  lat = x$V3
+  alt = x$V5
+  return(rbind(lon,lat,alt))
+}
+
+

@@ -8,19 +8,21 @@ source("functions.R")
 
 # path to SMOS nc files
 # see Shellscripts/SMOS_extract.sh
-path    <- "/disk1/asmundb/SMOS/nc/"
+path    <- "/disk1/asmundb/SMOS/"
 
 # path to save OBSERVATIONS_XXXXXXXX.DAT files (input in soda)
-outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/2016/"
+outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/"
 
 #####################################################################
 #####################################################################
 
 # coordinate pairs, model grid / station points
 # read from stationlist or something?
-npoints <- 2
-I      <- seq(from=11.04, to=11.4, length=npoints)   # longtitude
-J      <- seq(from=61.649, to=61.19, length=npoints)  # latitude
+coords <- coords_from_stlist("stationlist.cfg")
+npoints <- dim(coords)[2]
+
+I      <- coords[1,]  # longtitude
+J      <- coords[2,]  # latitude
 
 # check for missmatch
 if (length(I) != length(J)) {
@@ -83,7 +85,7 @@ for (l in 1:ndates) {
   # Descending ---||--- (D) at H18
 
   outfile <- "OBSERVATIONS_"
-  yymmdd <- substr(strsplit(strsplit(A_files[l],split="/")[[1]][7], split="_")[[1]][5],3,8)
+  yymmdd <- substr(strsplit(strsplit(A_files[l],split="/")[[1]][6], split="_")[[1]][5],3,8)
   out_A <- paste(outpath, outfile, yymmdd,"H06", ".DAT", sep="")
   out_D <- paste(outpath, outfile, yymmdd,"H18", ".DAT", sep="")
   write(SM_points_A, out_A, ncolumns=1) #write to file
