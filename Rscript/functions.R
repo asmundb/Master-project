@@ -42,11 +42,61 @@ coords_from_stlist <- function(stationlist){
   # Read coordinates from stationlist.cfg file
   #
   #
-  x = read.table("stationlist.cfg",header=F,skip=1,comment.char="#")
+  x = read.table(stationlist,header=F,skip=1,comment.char="#")
   lon = x$V4
   lat = x$V3
   alt = x$V5
   return(rbind(lon,lat,alt))
 }
 
+#### read_stlist ####
+read_stlist <- function(stationlist){
+  # Read name stnr lon lat alt from stationlist.cfg file
+  #
+  #
+  x = read.table(stationlist,header=F,skip=1,comment.char="#")
+  snr = x$V1
+  stnr= x$V2
+  name= x$V6
+  lon = x$V4
+  lat = x$V3
+  alt = x$V5
+  x   = cbind(stnr,lon,lat,alt)
+  dimnames(x)[[1]] <- name
+  return(x)
+}
 
+#### read_OBSERVATION ####
+read_OBSERVATION <- function(OBS_file){
+  # Read OBSERVATIONS.DAT file used by SODA
+  # 
+  # 
+  x = read.table(file=OBS_file)
+  return(x) 
+}
+#### get_var ####
+get_var <- function(file, varname){
+  # 
+  # open [filename] and read [varname]
+  # returns array (ntime, npoints)
+  ncid      = nc_open(file)
+  npoints   = ncid$dim$Number_of_points$len
+  # time from ncid
+  ntimes    = ncid$dim$time$len
+  timeUnit  = ncid$dim$time$units
+  itimes    = ncid$dim$time$vals
+  tmp       = gsub("hours since ", "", timeUnit)
+  startTime = as.POSIXlt(tmp)
+  # analysis or prognosis
+  if (ntimes == 1){ # analysis
+    times = startTime
+    } else { # prognosis
+    times = startTime + itimes*3600
+  }
+  num_times = as.numeric(format(times,"%Y%m%d%H"))
+  # get var
+  var       = t(ncvar_get(ncid, ncid$var[[varname]]))
+  dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
+  dimnames(var)[[1]] = num_times
+  return(var)
+}
