@@ -8,7 +8,7 @@ source("functions.R")
 
 # path to SMOS nc files
 # see Shellscripts/SMOS_extract.sh
-path    <- "/disk1/asmundb/SMOS/"
+path    <- "/disk1/asmundb/SMOS/nc"
 
 # path to save OBSERVATIONS_XXXXXXXX.DAT files (input in soda)
 outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/"
@@ -90,5 +90,6 @@ for (l in 1:ndates) {
   out_D <- paste(outpath, outfile, yymmdd,"H18", ".DAT", sep="")
   write(SM_points_A, out_A, ncolumns=1) #write to file
   write(SM_points_D, out_D, ncolumns=1) 
+  print(yymmdd)
 }
 # done 
