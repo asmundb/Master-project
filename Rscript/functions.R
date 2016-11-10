@@ -90,12 +90,29 @@ get_var <- function(file, varname){
   # analysis or prognosis
   if (ntimes == 1){ # analysis
     times = startTime
-    } else { # prognosis
+  } else { # prognosis
     times = startTime + itimes*3600
   }
   num_times = as.numeric(format(times,"%Y%m%d%H"))
   # get var
   var       = t(ncvar_get(ncid, ncid$var[[varname]]))
+  dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
+  dimnames(var)[[1]] = num_times
+  return(var)
+}
+
+#### get_analysis ####
+get_analysis <- function(file, varname){
+  #
+  # read ISBA_PROGNOSTICS.OUT.NC created by homemade EnKF
+  # 
+  ncid       = nc_open(file)
+  npoints    = ncid$dim$x$len
+  ntimes     = ncid$dim$y$len
+  filename   = ncid$filename
+  yyyymmddhh = paste("20", gsub(".nc", "", gsub(".*analysis_", "", filename)), sep="")
+  num_times  = as.numeric(yyyymmddhh)
+  var        = t(ncvar_get(ncid, ncid$var[[varname]]))
   dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
   dimnames(var)[[1]] = num_times
   return(var)

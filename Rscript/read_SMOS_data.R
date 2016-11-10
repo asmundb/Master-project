@@ -48,8 +48,8 @@ nvars  <- length(vars)
 l=1
 
 ncid    <- nc_open(A_files[l])
-nlat    <- ncid_A$dim$lat$len
-nlon    <- ncid_A$dim$lon$len
+nlat    <- ncid$dim$lat$len
+nlon    <- ncid$dim$lon$len
 
 x <- array(0, dim=c(nlon,nlat))
 ones <- array(1, dim=c(nlon,nlat))

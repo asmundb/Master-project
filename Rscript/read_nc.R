@@ -20,7 +20,7 @@ nfiles.offline  <- length(files.offline)
 stations <- read_stlist(stationlist="stationlist.cfg")
 
 #vars <- c("TG1","TG2","WG1","WG2")
-vars <- "WG2"
+vars <- "TG1"
 
 nvars <- length(vars)
 
@@ -36,6 +36,8 @@ for (i in 2:nfiles.offline){
 }
 
 col = rainbow(8)
+
+#pdf("first_run_ever.pdf")
 plot(NA,xlim=c(0,24),ylim=c(min(var.offline),max(var.offline)))
 for (i in 1:8){
   for (j in 1:4){
@@ -59,4 +61,6 @@ points(rep(18,8), obs2, bg=col, pch=24)
 abline(v=c(6,18),lwd=0.1)
 
 legend("topleft", legend=dimnames(stations)[[1]], fill=col)
-#legend("bottomleft", legend=c("SMOS", "analysis","offline"), 
+#legend("bottomleft", legend=c("SMOS", "analysis","offline"),
+
+#dev.off()
