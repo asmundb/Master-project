@@ -6,75 +6,63 @@
 #
 #
 library("ncdf4")
-source("functions.R")
+source("/home/asmundb/Master-project/Rscript/functions.R")
 
-path  <- "/home/asmundb/SURFEX2/EXPERIMENTS/SODA_EKF/time_series"
+args <- commandArgs(trailingOnly=T)
+if (length(args) == 0){
+  stop("please specify variable name as argument")
+} else if (length(args) == 1) {
+  var <- args[1]
+  filename <- sprintf("%s.dat",var)
+} else {
+  var <- args[1]
+  filename <- args[2]
+}
 
-files.analysis  <- list.files(path=path, pattern="soda_analysis*",full.name=T) # test if nc mabye
-
+#### get files ####
+# SURFEX output
+path.ts  <- "/home/asmundb/SURFEX2/EXPERIMENTS/SODA_EKF/time_series"
+files.analysis  <- list.files(path=path.ts, pattern="soda_analysis*",full.name=T) # test if nc mabye
 nfiles.analysis <- length(files.analysis)
-files.offline  <- list.files(path=path, pattern="soda_offline*",full.name=T)
-
+files.offline  <- list.files(path=path.ts, pattern="soda_offline*",full.name=T)
 nfiles.offline  <- length(files.offline)
 
-
 # stations/points
-stations <- read_stlist(stationlist="stationlist.cfg")
+stations <- read_stlist(stationlist="/home/asmundb/Master-project/Rscript/stationlist.cfg")
 
-#vars <- c("TG1","TG2","WG1","WG2")
-vars <- "WG1"
-
-nvars <- length(vars)
-
-# analysis
-var.analysis <- get_var(files.analysis[1],vars)
-for (i in 2:nfiles.analysis){
-  var.analysis <- rbind(var.analysis, get_var(files.analysis[i],vars))
-}
-
-var.offline <- get_var(files.offline[1],vars)
-for (i in 2:nfiles.offline){
-    var.offline <- rbind(var.offline, get_var(files.offline[i],vars))
-}
-
-col = rainbow(8)
-
-#pdf("first_run_ever.pdf")
-plot(NA,xlim=c(0,6*nfiles.offline),ylim=c(0,1))
-for (i in 1:8){
-  for (j in 1:nfiles.offline){
-    lines(1:6+(j-1)*6, var.offline[1:6+(j-1)*6,i],col=col[i])
-  }
-# lines(c(6,7), c(var.analysis[1,i], var.offline[7,i]),col=col[i])
-# lines(c(12,13), var.offline[12:13,i],col=col[i])
-# lines(c(18,19), c(var.analysis[2,i], var.offline[19,i]),col=col[i])
-  points(seq(6,nfiles.analysis*12,12),var.analysis[,i],col=col[i])
-
-}
-
-#obs1 <- read_OBSERVATION("~/SURFEX2/EXPERIMENTS/SODA_EKF/INPUT/OBSERVATIONS_161016H06.DAT")[[1]]
-#obs2 <- read_OBSERVATION("~/SURFEX2/EXPERIMENTS/SODA_EKF/INPUT/OBSERVATIONS_161016H18.DAT")[[1]]
-
+# SMOS observation
 obspath <- "/disk1/asmundb/SMOS/OBSERVATIONS"
 obsfiles <- list.files(path=obspath,pattern="OBSERVATIONS*", full.name=T)
 
 
+#### read files ####
+cat("\r","reading observations...                ")
 obs <- array(dim=c(0,8))
 for (i in 1:nfiles.analysis){
   obs <- rbind(obs, read_OBSERVATION(obsfiles[i])[[1]])
 }
+flush.console()
 
-
-#obs1[which(obs1==999)] <- -0.03
-#obs2[which(obs1==999)] <- -0.03
-for (i in 1:nfiles.analysis){
-  points(rep(12*(i-1)+6,8), obs[i,], bg=col, pch=24)
+cat("\r","reading analyses...                   ")
+# analysis
+var.analysis <- get_var(files.analysis[1],var)
+for (i in 2:nfiles.analysis){
+  var.analysis <- rbind(var.analysis, get_var(files.analysis[i],var))
 }
-#points(rep(18,8), obs2, bg=col, pch=24)
 
-#abline(v=c(6,18),lwd=0.1)
+flush.console()
+cat("\r","reading offline...                     ")
+# offline
+var.offline <- get_var(files.offline[1],var)
+for (i in 2:nfiles.offline){
+    var.offline <- rbind(var.offline, get_var(files.offline[i],var))
+}
+flush.console()
+#### save to file ####
+cat("\r","saving variables...                      ")
+save(var.analysis, var.offline, obs, file=filename)
 
-#legend("topleft", legend=dimnames(stations)[[1]], fill=col)
-#legend("bottomleft", legend=c("SMOS", "analysis","offline"),
+cat("\r", sprintf("done: variables saved to %s        ",filename))
+cat("\n")
 
-#dev.off()
+#######################################################################
