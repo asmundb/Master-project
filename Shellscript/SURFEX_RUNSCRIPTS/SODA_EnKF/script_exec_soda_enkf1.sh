@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+set -x
 
 nens=5
 
@@ -28,7 +28,7 @@ RUNDIR=$(pwd)
 #./PREP.EXE
 #beginning of simulation
 
-AAAAMMJJRR_deb=2016101600
+AAAAMMJJRR_deb=2016050100
 AAAAMMJJRR=$AAAAMMJJRR_deb
 
 
@@ -38,9 +38,9 @@ jj=`echo $AAAAMMJJRR | cut -c7-8`
 RR=`echo $AAAAMMJJRR | cut -c9-10`
 
 #end of simulation
-AAAAMMJJRR_end=2016101618
+#AAAAMMJJRR_end=2016050100
 
-#AAAMMJJRR_end=2007010109
+AAAAMMJJRR_end=2016101618
 
 #./GET_CANARI.sh $RUNDIR "july_2012" $aa $mm $jj $RR # What does EXP2 do here?!!!!!!
 
@@ -122,7 +122,7 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
       echo 'hellllo_next_cycle', ${ens}
       cp -f OPTIONS.nam_$ens OPTIONS.nam_save
       sed -e "s/LENS_GEN = T/LENS_GEN = F/g" OPTIONS.nam_save > OPTIONS.nam_temp   #jb: changed to T to check if we spread the ensembles for each time
-	  cp -f $RUNDIR/OUTPUT/SURFOUT_${ens}.nc PREP_${ens}.nc
+	  cp -f $RUNDIR/SURFOUT_${ens}.nc PREP_${ens}.nc
       sed -e "s/CPREPFILE = \"PREP\"/CPREPFILE = \"PREP_${ens}\"/g" OPTIONS.nam_temp > OPTIONS.nam_$ens
     else
       echo 'hellllo', ${ens}
@@ -185,8 +185,8 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
 #      rm -f PREP_$aa0$mm0${jj0}*.nc
 
       echo 'finished soda'
-      rm -f CANARI_NATURE_$aa0$mm0${jj0}H${RR0}.DAT
-      rm -f OBSERVATIONS_$aa0$mm0${jj0}H${RR0}.DAT  
+      rm -f CANARI_NATURE_$aa0$mm0${jj0}H${RR}.DAT
+      rm -f OBSERVATIONS_$aa0$mm0${jj0}H${RR}.DAT  
 
       #save output analysed files
       echo 'debug 3'
@@ -204,12 +204,6 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
 #      fi
       echo 'debug 5'
 #      rm -f PREP_*_EKF_ENS*.nc
-	  ens=1
-	  while [ $ens -le $nens ]
-      do
-        mv PREP_${aa}${mm}${jj}H${RR}_EKF_ENS${ens}.nc $RUNDIR/OUTPUT/SURFOUT_$ens.nc
-        ens=$(( $ens + 1 ))
-      done
 
       #./PUT_RES.sh $RUNDIR "EXP2" $aa0 $mm0 $jj0 $NT
       echo 'debug 6'
@@ -236,4 +230,4 @@ rm -f *.EXE
 rm -f PREP_*.nc
 rm -f OBSERVATIONS_*
 rm -f CANARI_NATURE*
-rm -f OPTIONS.nam_1 OPTIONS.nam_2 OPTIONS.nam_3 OPTIONS.nam_4 OPTIONS.nam_5 OPTIONS.nam_temp OPTIONS.nam_save OPTIONS.nam_S
+#rm -f OPTIONS.nam_1 OPTIONS.nam_2 OPTIONS.nam_3 OPTIONS.nam_4 OPTIONS.nam_5 OPTIONS.nam_temp OPTIONS.nam_save OPTIONS.nam_S

@@ -4,6 +4,7 @@
 #SBATCH --partition=medium
 #SBATCH --mem 15000
 
+set -x
 
 RUNDIR=$(pwd)
 #execdir=/home/jostein/SURFEX-LDAS/trunk/MY_RUN/rundir/
@@ -24,6 +25,8 @@ ln -s $RUNDIR/*.bin .
 #
 ln -f $RUNDIR/PGD.nc .
 ln -f $RUNDIR/PREP* .    #### ???????????????????
+#cp $RUNDIR/OUTPUT/SURFOUT_*.nc .
+#rename s/SURFOUT/PREP/ SURFOUT*
 #
 ln -f $RUNDIR/OBSERVATION*.DAT .
 #
@@ -65,12 +68,13 @@ mv -f LISTING_SODA*.txt $RUNDIR/LISTING
 mv -f soda $RUNDIR/LISTING 
 
 
+rename s/SURFOUT/SURFOUT_/ SURFOUT*
 
-#mv -f PREP_1.nc $RUNDIR/SURFOUT_1.nc
-#mv -f PREP_2.nc $RUNDIR/SURFOUT_2.nc
-#mv -f PREP_3.nc $RUNDIR/SURFOUT_3.nc
-#mv -f PREP_4.nc $RUNDIR/SURFOUT_4.nc
-#mv -f PREP_5.nc $RUNDIR/SURFOUT_5.nc
+#mv -f PREP_1.nc $RUNDIR/OUTPUT2/SURFOUT_1.nc
+#mv -f PREP_2.nc $RUNDIR/OUTPUT2/SURFOUT_2.nc
+#mv -f PREP_3.nc $RUNDIR/OUTPUT2/SURFOUT_3.nc
+#mv -f PREP_4.nc $RUNDIR/OUTPUT2/SURFOUT_4.nc
+#mv -f PREP_5.nc $RUNDIR/OUTPUT2/SURFOUT_5.nc
 
 #mv -f SURFOUT*.* $RUNDIR
 #
@@ -78,12 +82,15 @@ aa=$1
 mm=$2
 jj=$3
 NT=$4
-#for file in *.OUT.nc
-#do 
-#  mv $file ${file}_${aa}${mm}${jj}${NT}.nc
 
-mv ISBA_PROGNOSTIC.OUT.nc $RUNDIR/time_series/EnKF_analysis_${aa}${mm}${jj}${NT}.nc
-#done
+ls SURFOUT*
+for file in SURFOUT_*.nc
+do
+  ens=`echo $file | cut -c9`
+  cp $file $RUNDIR/time_series/analyses/soda_analysis_$ens.nc_20${aa}${mm}${jj}${NT}
+#  mv ISBA_PROGNOSTIC.OUT.nc $RUNDIR/time_series/offline/ISBA_PROGNOSTIC_${aa}${mm}${jj}${NT}.nc_EnKF
+done
+
 #tar cvf assim_$aa$mm${jj}${NT}.tar ISBA_PROGNOSTIC.OUT_${aa}${mm}${jj}${NT}.nc
 #gzip assim_$aa$mm${jj}${NT}.tar
 #mv -f assim*.tar.gz $RUNDIR
@@ -94,7 +101,7 @@ mv ISBA_PROGNOSTIC.OUT.nc $RUNDIR/time_series/EnKF_analysis_${aa}${mm}${jj}${NT}
 #gzip increments_$aa$mm${jj}${NT}.tar
 
 #mv -f increments_*.tar.gz $RUNDIR
-
+mv -f SURFOUT_* $RUNDIR/
 mv -f RV_*.DAT $RUNDIR/OUTPUT
 #
 #

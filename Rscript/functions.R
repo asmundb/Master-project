@@ -98,6 +98,7 @@ get_var <- function(file, varname){
   var       = t(ncvar_get(ncid, ncid$var[[varname]]))
   dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
   dimnames(var)[[1]] = num_times
+  stat = nc_close(ncid)
   return(var)
 }
 
@@ -110,10 +111,11 @@ get_analysis <- function(file, varname){
   npoints    = ncid$dim$x$len
   ntimes     = ncid$dim$y$len
   filename   = ncid$filename
-  yyyymmddhh = paste("20", gsub(".nc", "", gsub(".*analysis_", "", filename)), sep="")
+  yyyymmddhh = gsub(".nc", "", gsub(".*nc_", "", filename))
   num_times  = as.numeric(yyyymmddhh)
   var        = t(ncvar_get(ncid, ncid$var[[varname]]))
   dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
   dimnames(var)[[1]] = num_times
+  stat = nc_close(ncid)
   return(var)
 }

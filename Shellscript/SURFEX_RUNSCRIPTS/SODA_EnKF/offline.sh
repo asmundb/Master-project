@@ -89,7 +89,7 @@ NT=$4
 #for file in *.OUT.nc
 #  do 
 
-mv ISBA_PROGNOSTIC.OUT.nc  $RUNDIR/time_series/ISBA_PROGNOSTIC.OUT_${aa}${mm}${jj}${NT}_ens_PP.nc
+mv ISBA_PROGNOSTIC.OUT.nc  $RUNDIR/time_series/offline/ISBA_PROGNOSTIC.OUT_${aa}${mm}${jj}${NT}_ens_PP.nc
 #    mv $file ${file}_${aa}${mm}${jj}${NT}_en_1
 #  done
 #tar cvf output_$aa$mm${jj}${NT}_PP.tar ISBA_PROGNOSTIC.OUT_${aa}${mm}${jj}${NT}_ens_PP.nc

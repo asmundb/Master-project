@@ -1,3 +1,4 @@
+#!/usr/bin/Rscript
 # Read NetCDF files created by SURFEX ( ISBA_PROGNOSTIC.OUT.nc )
 # data output: (ntimes, nvars, npoints)
 # if file is soda_analysis, ntimes=1 
@@ -10,14 +11,16 @@ source("/home/asmundb/Master-project/Rscript/functions.R")
 
 args <- commandArgs(trailingOnly=T)
 if (length(args) == 0){
-  stop("please specify variable name as argument")
+  cat("Usage:
+       $read_nc.R varname outfile path2ncfiles")
+  stop()
 } else if (length(args) == 1) {
 #  var <- args[1]
-#  filename <- sprintf("%s.dat",var)
+#  outfile <- sprintf("%s.dat",var)
   stop("3 argumens required")
 } else {
   var <- args[1]
-  filename <- args[2]
+  outfile <- args[2]
   path.ts <- args[3]
 }
 
@@ -66,9 +69,9 @@ for (i in 2:nfiles.offline){
 flush.console()
 #### save to file ####
 cat("\r","saving variables...                      ")
-save(var.analysis, var.offline, obs, file=filename)
+save(var.analysis, var.offline, obs, file=outfile)
 
-cat("\r", sprintf("done: variables saved to %s        ",filename))
+cat("\r", sprintf("done: variables saved to %s        ",outfile))
 cat("\n")
 
 #######################################################################
