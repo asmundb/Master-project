@@ -96,7 +96,7 @@ get_var <- function(file, varname){
   num_times = as.numeric(format(times,"%Y%m%d%H"))
   # get var
   var       = t(ncvar_get(ncid, ncid$var[[varname]]))
-  dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
+  dimnames(var)[[2]] = c(sprintf("point_%d",1:npoints))
   dimnames(var)[[1]] = num_times
   stat = nc_close(ncid)
   return(var)
@@ -108,14 +108,34 @@ get_analysis <- function(file, varname){
   # read ISBA_PROGNOSTICS.OUT.NC created by homemade EnKF
   # 
   ncid       = nc_open(file)
-  npoints    = ncid$dim$x$len
-  ntimes     = ncid$dim$y$len
+  npoints    = ncid$dim$Number_of_points$len
   filename   = ncid$filename
   yyyymmddhh = gsub(".nc", "", gsub(".*nc_", "", filename))
-  num_times  = as.numeric(yyyymmddhh)
+  num_times  = as.numeric(strsplit(yyyymmddhh,split="_")[[1]][1])
   var        = t(ncvar_get(ncid, ncid$var[[varname]]))
-  dimnames(var)[[2]] = c(sprintf("point_%d",1:8))
+  dimnames(var)[[2]] = c(sprintf("point_%d",1:npoints))
   dimnames(var)[[1]] = num_times
   stat = nc_close(ncid)
   return(var)
+}
+
+#### prt2pntReshape ####
+prt2pntReshape <- function(x){
+  # reshape list
+  # x  = list[[perturbation]][time,point]
+  # xx = array[time, perturbation, point]
+  #
+  npoints <- dim(x[[1]])[2]
+  nprt    <- length(x)
+  ntimes  <- dim(x[[1]])[1]
+  xx <- array(NA, dim=c(ntimes,nprt, npoints))                              
+  for (prt in 1:nprt){
+    for (pnt in 1:npoints){
+	  xx[,prt,pnt] <- x[[prt]][,pnt]
+	}
+  }
+  dimnames(xx)[[1]] <- dimnames(x[[1]])[[1]]
+  dimnames(xx)[[2]] <- c(sprintf("pert_%d",1:nprt))
+  dimnames(xx)[[3]] <- dimnames(x[[1]])[[2]]
+  return(xx)
 }
