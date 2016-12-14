@@ -55,7 +55,7 @@ export OMP_NUM_THREADS=1
 
 echo "Before run?"
 
-./soda.exe > soda
+./soda.exe > soda || exit 1
 #wait 
 
 echo "After run?"
@@ -87,7 +87,7 @@ ls SURFOUT*
 for file in SURFOUT_*.nc
 do
   ens=`echo $file | cut -c9`
-  cp $file $RUNDIR/time_series/analyses/soda_analysis_$ens.nc_20${aa}${mm}${jj}${NT}
+  cp $file $RUNDIR/time_series/analysis/soda_analysis.nc_20${aa}${mm}${jj}${NT}_ens_$ens || exit 1
 #  mv ISBA_PROGNOSTIC.OUT.nc $RUNDIR/time_series/offline/ISBA_PROGNOSTIC_${aa}${mm}${jj}${NT}.nc_EnKF
 done
 

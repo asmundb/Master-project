@@ -8,14 +8,20 @@ source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX
 ########################################################
 ############ USER INPUT ################################
 start=2016050100
-end=2016071700
-DA="no" #Data assimilation: DA="yes"
+end=2016050400
+DA="yes" #Data assimilation: DA="yes"
         #open loop:         DA="no"
 
 
 #########################################################
 export expdir=$PWD
-#outpath=time_series/
+outpath=time_series/
+
+if [[ "$DA" = "yes" ]]; then
+  offdir="offline"
+else
+  offdir="openloop"
+fi
 
 
 dtg=$start
@@ -34,7 +40,7 @@ while [ $dtg -lt $end ]; do
 
   case $DA in
     "yes")
-	  outpath=soda_timeseries/
+#	  outpath=time_series/
       if [ $hh -eq 06 -o  $hh -eq 18 ]; then
       echo "skip this "
       analysis="no"
@@ -43,8 +49,9 @@ while [ $dtg -lt $end ]; do
     fi
   ;;
     "no")
-	outpath=openloop_timeseries/
+#	outpath=time_series/p
     analysis="no"
+  
   esac
 
   echo "analysis: "$analysis   
@@ -53,12 +60,12 @@ while [ $dtg -lt $end ]; do
   ./run_soda_smos.sh $dtg $mode $analysis || exit 1
 
   if [[ "$analysis" = "yes" ]]; then
-   	cp $expdir/RUN/RUN_OFFLINE_PERT_00/ISBA_PROGNOSTIC.OUT.nc $outpath/soda_offline.nc_$dtg"_"$dtg2 || exit 1
-    cp $expdir/RUN/RUN_EKF/ISBA_PROGNOSTIC.OUT.nc $outpath/soda_analysis.nc_$dtg2 || exit 1
+    cp $expdir/RUN/RUN_OFFLINE_PERT_00/ISBA_PROGNOSTIC.OUT.nc $outpath/offline/ISBA_PROGNOSTIC.OUT.nc_$dtg || exit 1
+    cp $expdir/RUN/RUN_EKF/ISBA_PROGNOSTIC.OUT.nc $outpath/analysis/soda_analysis.nc_$dtg2 || exit 1
     mv $expdir/OUTPUT/PREP_SODA_EKF.nc $expdir/OUTPUT/PREP_SODA.nc      || exit 1
   else  
-    cp $expdir/RUN/RUN_OFFLINE/ISBA_PROGNOSTIC.OUT.nc $outpath/soda_offline.nc_$dtg"_"$dtg2 || exit 1
-	mv $expdir/OUTPUT/PREP_OFFLINE.nc $expdir/OUTPUT/PREP_SODA.nc
+    cp $expdir/RUN/RUN_OFFLINE/ISBA_PROGNOSTIC.OUT.nc $outpath/$offdir/ISBA_PROGNOSTIC.OUT.nc_$dtg || exit 1
+	mv $expdir/OUTPUT/PREP_OFFLINE.nc $expdir/OUTPUT/PREP_SODA.nc || exit 1
   fi
 
   mode=0

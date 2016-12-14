@@ -55,6 +55,7 @@ echo "Before run?"
 ./soda.exe > soda
 #wait
 #ls -ltr
+exit 1
 echo "After run?"
 #
 #ls -l
@@ -79,12 +80,13 @@ mm=$2
 jj=$3
 NT=$4
 
-#for file in *.OUT.nc
-#do 
-#  mv $file ${file}_${aa}${mm}${jj}${NT}.nc
+ens=1
+for file in $RUNDIR/SURFOUT_*
+do 
+  cp $file $RUNDIR/time_series/analysis/soda_analysis.nc_${aa}${mm}${jj}${NT}_ens_$ens
+  ens=$((ens+1))
+done
 
-mv ISBA_PROGNOSTIC.OUT.nc $RUNDIR/time_series/EnKF_analysis_${aa}${mm}${jj}${NT}.nc
-#done
 #tar cvf assim_$aa$mm${jj}${NT}.tar ISBA_PROGNOSTIC.OUT_${aa}${mm}${jj}${NT}.nc
 #gzip assim_$aa$mm${jj}${NT}.tar
 #mv -f assim*.tar.gz $RUNDIR

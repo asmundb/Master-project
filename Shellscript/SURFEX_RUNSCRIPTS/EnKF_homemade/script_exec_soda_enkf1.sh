@@ -28,7 +28,7 @@ RUNDIR=$(pwd)
 #./prep.exe || exit "prep error"
 #beginning of simulation
 
-AAAAMMJJRR_deb=2016101600
+AAAAMMJJRR_deb=2016050100
 AAAAMMJJRR=$AAAAMMJJRR_deb
 
 
@@ -38,7 +38,8 @@ jj=`echo $AAAAMMJJRR | cut -c7-8`
 RR=`echo $AAAAMMJJRR | cut -c9-10`
 
 #end of simulation
-AAAAMMJJRR_end=2016101618
+AAAAMMJJRR_end=2016101700
+AAAAMMJJRR_end=2016050200
 
 #AAAAMMJJRR_end=2007010109
 

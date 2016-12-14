@@ -8,20 +8,9 @@ related to my master study. Scripts for running SURFEX should also be added incl
 * Makefile: 
   automates plotting 
 
-  Dependencies
 
-  NC\_FILES(SURFEX output)    read\_nc.R    plot\_timeserie.R
-                   \            /            /
-				    \          /            /
-					 \        /            /
-					  \      /            /
-					   \    /            /
-		               *.dat            /
-		                   \           /
-						    \         /
-							 \       /
-							  \     /
-							   *.pdf
+* Makefile.SMOS:
+  create OBSERVATIONS.DAT files for given downloaded tgz files.
 
 
 

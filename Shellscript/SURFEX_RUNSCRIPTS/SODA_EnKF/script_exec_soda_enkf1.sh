@@ -29,8 +29,9 @@ RUNDIR=$(pwd)
 #beginning of simulation
 
 AAAAMMJJRR_deb=2016050100
-AAAAMMJJRR=$AAAAMMJJRR_deb
 
+AAAAMMJJRR=$AAAAMMJJRR_deb
+#AAAAMMJJRR=2016082018
 
 aa=`echo $AAAAMMJJRR | cut -c3-4`
 mm=`echo $AAAAMMJJRR | cut -c5-6`
@@ -38,9 +39,9 @@ jj=`echo $AAAAMMJJRR | cut -c7-8`
 RR=`echo $AAAAMMJJRR | cut -c9-10`
 
 #end of simulation
-#AAAAMMJJRR_end=2016050100
+AAAAMMJJRR_end=2016050400
 
-AAAAMMJJRR_end=2016101618
+#AAAAMMJJRR_end=2016101700
 
 #./GET_CANARI.sh $RUNDIR "july_2012" $aa $mm $jj $RR # What does EXP2 do here?!!!!!!
 
@@ -59,7 +60,7 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
   jj0=`echo $AAAAMMJJRR | cut -c7-8`
   RR0=`echo $AAAAMMJJRR | cut -c9-10`
 
- # Forcings
+# Forcings
 
   case $RR0 in
    00) NT=00;;
@@ -130,7 +131,7 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
     fi
     sed -e "s/PP/$ens/g" offline.sh > OFFLINE_$ens.EXE
 	chmod +x OFFLINE_$ens.EXE
-    ./OFFLINE_$ens.EXE $aa0 $mm0 $jj0 ${NT} ${nens}  # Need time here as well because of 6h cyclem, removed exclusive
+    ./OFFLINE_$ens.EXE $aa0 $mm0 $jj0 ${NT} ${nens} || exit 1  # Need time here as well because of 6h cyclem, removed exclusive
 
     ens2=$ens
     ens=$(( $ens + 1 ))
@@ -155,7 +156,7 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
       while [ $ens -le $nens ]
       do
   	    mv -f SURFOUT_${ens}.nc PREP_${aa}${mm}${jj}H${RR}_EKF_ENS${ens}.nc
-    	ens=$(( $ens + 1 ))
+        ens=$(( $ens + 1 ))
       done
 
       if [ $RR -eq 06 ]
@@ -177,13 +178,12 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
       echo "####### SODA_ASSIM " 
       ./soda.sh $aa $mm $jj $RR || exit 1
 
-
 #      mv -f output*.tar.gz /home/jostein/scratch_data/ASSIM_EUROPE/$EXP/
 #      mv -f increments_*.tar.gz /home/jostein/scratch_data/ASSIM_EUROPE/$EXP/
 #      mv -f SURFEX_RESULTS /home/jostein/scratch_data/ASSIM_EUROPE/$EXP/SURFEX_Results_$aa0$mm0${jj0}H${RR0}
       # mv -f output_*.tar.gz $repres pdh
 #      rm -f PREP_$aa0$mm0${jj0}*.nc
-
+      
       echo 'finished soda'
       rm -f CANARI_NATURE_$aa0$mm0${jj0}H${RR}.DAT
       rm -f OBSERVATIONS_$aa0$mm0${jj0}H${RR}.DAT  
@@ -193,7 +193,7 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
 #      mv -f assim_$aa0$mm0${jj0}${NT}.tar.gz /home/jostein/scratch_data/ASSIM_EUROPE/$EXP/
       echo 'debug 4'
       #rm -f assim_$aa0$mm0${jj0}.tar.gz 
-      rm -f *.OUT*
+#      rm -f *.OUT*
 
       #save surfout analysed file only once a day
 #      if [ $RR -eq 06 ]
@@ -203,9 +203,8 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
 #         mv -f prep_$aa0$mm0${jj0}${NT}.tar.gz /home/jostein/scratch_data/ASSIM_EUROPE/$EXP/
 #      fi
       echo 'debug 5'
-#      rm -f PREP_*_EKF_ENS*.nc
+#      rm -f PREP_*_EKF_ENS*.nc || exit 1
 
-      #./PUT_RES.sh $RUNDIR "EXP2" $aa0 $mm0 $jj0 $NT
       echo 'debug 6'
       
       ens=1
@@ -226,8 +225,8 @@ ls OPTIONS.nam
 [ -f OPTIONS.nam ] &&  cp -f OPTIONS.nam OPTIONS.nam_save
 sed -e "s/LENS_GEN = F/LENS_GEN = T/g" OPTIONS.nam_save > OPTIONS.nam
 
-rm -f *.EXE
-rm -f PREP_*.nc
-rm -f OBSERVATIONS_*
-rm -f CANARI_NATURE*
+#rm -f *.EXE
+#rm -f PREP_*.nc
+#rm -f OBSERVATIONS_*
+#rm -f CANARI_NATURE*
 #rm -f OPTIONS.nam_1 OPTIONS.nam_2 OPTIONS.nam_3 OPTIONS.nam_4 OPTIONS.nam_5 OPTIONS.nam_temp OPTIONS.nam_save OPTIONS.nam_S
