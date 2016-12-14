@@ -5,23 +5,42 @@ library("ncdf4")
 
 
 ############### USER VARIABLES ########################################
-var      <- "WG2"  # surfex variable name
-nprt     <- 1  # number of perturbations/members of experiment
-saveObs  <- F  # if true save observations to file
-saveAna  <- F
-saveOff  <- F
-saveOpe  <- T
-expr     <- "SODA_EKF"        # name of experiment
 
-# path to time_series/ dir with model output
-#path.nc <- "/home/asmundb/SURFEX2/EXPERIMENTS/SODA_EKF/time_series/"
-#path.nc  <- "/home/asmundb/SURFEX2/EXPERIMENTS/homemade/time_series/"
+args <- commandArgs(trailingOnly=T)
+nargs <- length(args)
 
-path.out <- sprintf("dat/EKF/", expr)
-path.nc <- sprintf("/home/asmundb/SURFEX2/EXPERIMENTS/%s/time_series/",expr)
+
+path.nc  <- args[1]                   # path to nc model output
+file.out <- args[2]                   # path to save to
+var      <- args[3]                   # surfex variable name
+data     <- args[4]
+
+
+saveOpe  <- F     # if true save openloop to file
+saveObs  <- F     # if true save observations to file
+saveOff  <- F     # if true save prognosis to file
+saveAna  <- F     # if true save analysis to file
+
+
+if ( data == "analysis" ){
+  saveAna  <- T
+} else if (data == "offline" ){
+  saveOff  <- T
+} else if (data == "openloop"){
+  saveOpe  <- T
+} else if (data == "obs"){
+  saveObs  <- T
+} else {
+  print("unknown data")
+  stop()
+}
+
+#saveOpe  <- as.logical(args[4])       # if true save openloop to file
+#saveObs  <- as.logical(args[5])       # if true save observations to file
+#saveOff  <- as.logical(args[6])       # if true save prognosis to file
+#saveAna  <- as.logical(args[7])       # if true save analysis to file
 
 ########################################################################
-
 
 
 
@@ -34,7 +53,13 @@ nfiles.offline  <- length(files.offline)
 files.openloop   <- list.files(path=paste(path.nc,"openloop",sep=""),full.name=T)
 nfiles.openloop  <- length(files.openloop)
 
-
+# check if ensemble
+ensemble <- length(grep("ens_*", files.offline)) > 0
+if ( ensemble ){
+  nprt     <- max(as.numeric(substr(files.offline, nchar(files.offline), nchar(files.offline))))
+} else {
+  nprt <- 1
+}
 # get station info
 stations        <- read_stlist(stationlist="/home/asmundb/Master-project/Rscript/stationlist.cfg")
 
@@ -125,19 +150,40 @@ cat("\n")
 
 ###################### SAVE VARIABLES ##################################
 if (saveAna){
-  saveRDS(var.analysis, file=paste(path.out,var,".analysis.dat",sep=""))
+  saveRDS(var.analysis, file=file.out)
 }
 if (saveOff){
-  saveRDS(var.offline, file=paste(path.out,var,".offline.dat",sep=""))
+  saveRDS(var.offline, file=file.out)
 }
 
 if (saveOpe){
-		  saveRDS(var.openloop, file=paste(path.out,var,".openloop.dat",sep=""))
+  saveRDS(var.openloop, file=file.out)
 }
 
 if (saveObs){
-  saveRDS(obs, file=paste("dat/obs","obs.dat",sep="/"))
+  saveRDS(obs, file=file.out)
 }
+
+
+
+########################################################################
+
+
+###################### SAVE VARIABLES ##################################
+#if (saveAna){
+#		  saveRDS(var.analysis, file=paste(path.out,var,".analysis.dat",sep=""))
+#}
+#if (saveOff){
+#		  saveRDS(var.offline, file=paste(path.out,var,".offline.dat",sep=""))
+#}
+#
+#if (saveOpe){
+#		          saveRDS(var.openloop, file=paste(path.out,var,".openloop.dat",sep=""))
+#}
+#
+#if (saveObs){
+#		  saveRDS(obs, file=paste("dat/obs","obs.dat",sep="/"))
+#}
 
 
 
