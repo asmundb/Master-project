@@ -70,8 +70,11 @@ read_stlist <- function(stationlist){
 read_OBSERVATION <- function(OBS_file){
   # Read OBSERVATIONS.DAT file used by SODA
   # 
-  # 
-  x = read.table(file=OBS_file)
+  #
+  tstr       = regmatches(OBS_file, regexec("_(.*).DAT", OBS_file))[[1]][2]
+  yyyymmddhh = paste("20", gsub("H","",tstr),sep="")
+  x          = t(as.matrix(read.table(file=OBS_file)))
+  dimnames(x)[[1]]  = yyyymmddhh
   return(x) 
 }
 #### get_var ####
