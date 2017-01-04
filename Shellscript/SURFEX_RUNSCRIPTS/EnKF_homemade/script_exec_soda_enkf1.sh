@@ -39,7 +39,7 @@ RR=`echo $AAAAMMJJRR | cut -c9-10`
 
 #end of simulation
 AAAAMMJJRR_end=2016101700
-AAAAMMJJRR_end=2016050200
+#AAAAMMJJRR_end=2016050200
 
 #AAAAMMJJRR_end=2007010109
 
@@ -174,8 +174,8 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
       sed -e "s/LASSIM = F/LASSIM = T/g" OPTIONS.nam_save > OPTIONS.nam_S
       cp -f OPTIONS.nam_S OPTIONS.nam_save
       sed -e "s/CPREPFILE = \"PREP\"/CPREPFILE = \"PREP_${aa}${mm}${jj}H${RR}_EKF_ENS1\"/g" OPTIONS.nam_save > OPTIONS.nam_S
-      echo "####### SODA_ASSIM " 
-      ./soda.sh ${aa} ${mm} ${jj} ${RR} || exit "soda error"
+      echo "####### SODA_ASSIM " ${aa} ${mm} ${jj} ${RR} 
+      ./soda.sh ${aa} ${mm} ${jj} ${RR} || exit 1
  
 #     ls -ltr > ls.tmp
 #      mv -f output*.tar.gz OUTPUT/$EXP/

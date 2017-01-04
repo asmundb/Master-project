@@ -1,0 +1,56 @@
+&NAM_IO_VARASSIM       
+    LPRT = F,
+/
+&NAM_ASSIM
+    CASSIM_ISBA = "ENKF"
+/
+&NAM_ENS
+    NENS = 5
+    NIE = 0
+    XASSIM_WINH = 6
+    XINFL_M = 1.0, 1.0, 0.0,0.0, 0.0
+    XADDINFL_M = 0.12, 0.02, 0.0, 0.0, 0.0
+    XADDTIMECORR_M = 3., 8., 0., 0., 0.
+    LENS_GEN = F
+    LPB_CORRELATIONS = F
+    LPERTURBATION_RUN = F
+    LBIAS_CORRECTION = F
+    LENKF = T
+    LDENKF = F
+/
+
+&NAM_VAR
+    NIVAR = 1,
+	NVAR = 2,
+	CVAR_M(1)     = 'WG1',
+	CVAR_M(2)     = 'WG2',
+	CVAR_M(3)     = 'WG3',
+	CPREFIX_M(1)  = 'X_Y_WG1 (m3/m3)',
+	CPREFIX_M(2)  = 'X_Y_WG2 (m3/m3)',
+	CPREFIX_M(3)  = 'X_Y_WG3 (m3/m3)',
+	XSIGMA_M(1)   = 0.1,
+	XSIGMA_M(2)   = 0.1,
+	XSIGMA_M(3)   = 0.1,
+	XTPRT_M(1)    = 0.012,
+	XTPRT_M(2)    = 0.0025,
+	XTPRT_M(3)    = 0.0001,
+	NNCV(1)       = 1,
+	NNCV(2)       = 1,
+	NNCV(3)       = 0,
+	NNCV(4)       = 0,
+	NNCV(5)       = 0,
+	XSCALE_Q      = 0.125,
+	XSCALE_QLAI   = 0.5,
+	XALPH(1)      = 0.,
+	XALPH(2)      = 0.,
+	XALPH(3)      = 0.,
+	XALPH(4)      = 0.08203445,
+	XALPH(5)      = 0.07496252,
+	XALPH(6)      = 0.06846970,
+	XALPH(7)      = 0.06771856,
+	XALPH(8)      = 0.09744689,
+	XALPH(9)      = 0.09744689,
+	XALPH(10)     = 0.07164350,
+	XALPH(11)     = 0.17686594,
+	XALPH(12)     = 0.07164350
+/

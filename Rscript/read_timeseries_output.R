@@ -46,7 +46,7 @@ if ( data == "analysis" ){
 
 ########################################################################
 # List nc files
-files.analysis  <- list.files(path=paste(path.nc,"analyses",sep=""),full.name=T) # test if nc mabye
+files.analysis  <- list.files(path=paste(path.nc,"analysis",sep=""),full.name=T) # test if nc mabye
 nfiles.analysis <- length(files.analysis)
 files.offline   <- list.files(path=paste(path.nc,"offline",sep=""),full.name=T)
 nfiles.offline  <- length(files.offline)

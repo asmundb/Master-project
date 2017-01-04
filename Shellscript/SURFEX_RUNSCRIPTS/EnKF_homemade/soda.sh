@@ -52,10 +52,9 @@ export OMP_NUM_THREADS=1
 #ls -ltr
 echo "Before run?"
 #mpirun -np 1 ./soda.exe > soda
-./soda.exe > soda
+./soda.exe > soda || exit 1
 #wait
 #ls -ltr
-exit 1
 echo "After run?"
 #
 #ls -l

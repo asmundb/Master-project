@@ -3,12 +3,13 @@
 
 #ln -sf /disk1/asmundb/SMOS/OBSERVATIONS/* INPUT/
 
-source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX-V8-0-0-NOMPI-OMP-DEBUG-ASSIM_NILU
+source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX-V8-0-0-NOMPI-OMP-DEBUG-ASSIM_DIF
 
 ########################################################
 ############ USER INPUT ################################
 start=2016050100
-end=2016050400
+#end=2016050400
+end=2016050106
 DA="yes" #Data assimilation: DA="yes"
         #open loop:         DA="no"
 

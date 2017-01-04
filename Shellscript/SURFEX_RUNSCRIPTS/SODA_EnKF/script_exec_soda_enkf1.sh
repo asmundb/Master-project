@@ -39,9 +39,9 @@ jj=`echo $AAAAMMJJRR | cut -c7-8`
 RR=`echo $AAAAMMJJRR | cut -c9-10`
 
 #end of simulation
-AAAAMMJJRR_end=2016050400
+#AAAAMMJJRR_end=2016050400
 
-#AAAAMMJJRR_end=2016101700
+AAAAMMJJRR_end=2016050100
 
 #./GET_CANARI.sh $RUNDIR "july_2012" $aa $mm $jj $RR # What does EXP2 do here?!!!!!!
 
@@ -93,6 +93,8 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
   #increment the date
   AAAAMMJJRRobs=$AAAAMMJJRR
   AAAAMMJJRR=`SMS_DATE/smsdate $AAAAMMJJRR 6`
+
+  echo $AAAAMMJJRR
 
   aa=`echo $AAAAMMJJRR | cut -c3-4`
   mm=`echo $AAAAMMJJRR | cut -c5-6`
@@ -159,6 +161,8 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
         ens=$(( $ens + 1 ))
       done
 
+      echo "RR: " $RR
+
       if [ $RR -eq 06 ]
       then
           cp -f INPUT/OBSERVATIONS_$aa$mm${jj}H${RR}.DAT CANARI_NATURE_$aa$mm${jj}H${RR}.DAT
@@ -203,7 +207,7 @@ while [ $AAAAMMJJRR  -le $AAAAMMJJRR_end ]; do
 #         mv -f prep_$aa0$mm0${jj0}${NT}.tar.gz /home/jostein/scratch_data/ASSIM_EUROPE/$EXP/
 #      fi
       echo 'debug 5'
-#      rm -f PREP_*_EKF_ENS*.nc || exit 1
+      rm -f PREP_*_EKF_ENS*.nc || exit 1
 
       echo 'debug 6'
       
