@@ -8,7 +8,7 @@ source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX
 ########################################################
 ############ USER INPUT ################################
 start=2016050100
-#end=2016050112
+#end=2016050106
 end=2016101700
 
 
@@ -69,7 +69,7 @@ mkdir RESULTS/ANALYSIS
 mkdir RESULTS/ISBA
 
 dtg=$start
-mode=1
+mode=3
 
 
 while [ $dtg -lt $end ]; do

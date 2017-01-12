@@ -72,11 +72,6 @@ cd $work || exit 1
 
 ln -sf $expdir/EXE/offline.exe .
 
-case $exp in 
-  "ENKF")
-    cp -f $expdir/RV/RV_001_00$pert.DAT ./RV_001.DAT
-    cp -f $expdir/RV/RV_002_00$pert.DAT ./RV_002.DAT
-esac
 
 # Copy namelists
 cat $expdir/NAMELISTS/OPTIONS.nam_offline                \
@@ -99,6 +94,18 @@ sed -e "s/LPRT=LPRT/LPRT=$LPRT/g"        \
     -e "s/LASSIM=.TRUE./LASSIM=.FALSE./" \
     OPTIONS.nam.tmp1 > OPTIONS.nam.tmp
 cat $expdir/NAMELISTS/OPTIONS.nam_$suffix OPTIONS.nam.tmp > OPTIONS.nam
+eval `grep NVAR OPTIONS.nam | sed 's/,//' `
+
+case $exp in
+  "ENKF")
+    ivar=1
+#	echo $NVAR
+    while [[ $ivar -le $NVAR ]]; do
+#	  echo "RV_00${ivar}_00$pert.DAT"
+      cp -f $expdir/RV/RV_00${ivar}_00$pert.DAT ./RV_00$ivar.DAT
+      ivar=$(( ivar + 1 ))
+    done
+esac
 
 # Ecoclimap
 ln -sf $SRC_SURFEX/MY_RUN/ECOCLIMAP/*.bin .

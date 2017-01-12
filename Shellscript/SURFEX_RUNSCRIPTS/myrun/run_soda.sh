@@ -3,7 +3,7 @@
 #
 # TEST of SODA with smos data
 # 
-set -x
+#set -x
 ################################
 ### USER DEPENDENT VARIABLE ####
 ################################
@@ -31,6 +31,8 @@ fcint=06
 forc_format="nc"
 analysis=$5
 
+eval `grep NVAR NAMELISTS/OPTIONS.nam_$exp | sed 's/,//' `
+
 # number of perturbations/ensemle members
 case $exp in
   "OPENLOOP")
@@ -38,7 +40,7 @@ case $exp in
     npert=$4
   ;;
   "EKF")
-    eval `grep NVAR NAMELISTS/OPTIONS.nam_EKF | sed 's/,//' `
+#    eval `grep NVAR NAMELISTS/OPTIONS.nam_EKF | sed 's/,//' `
 	npert=$NVAR
 #	analysis=true
   ;;
@@ -237,9 +239,11 @@ done
 
 #############################  Analysis  ##########################################################
 
-
-cp $expdir/OUTPUT/PREP_OFFLINE_PERT_00.$suffix PREP_SODA.$suffix
-ln -sf PREP_SODA.$suffix PREP_INIT.$suffix
+case $exp in
+  "EKF")
+    cp $expdir/OUTPUT/PREP_OFFLINE_PERT_00.$suffix PREP_SODA.$suffix
+    ln -sf PREP_SODA.$suffix PREP_INIT.$suffix
+esac
 
 case $exp in
   "EKF")
