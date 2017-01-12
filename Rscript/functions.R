@@ -78,10 +78,14 @@ read_OBSERVATION <- function(OBS_file){
   return(x) 
 }
 #### get_var ####
-get_var <- function(file, varname){
+get_var <- function(file, varname, reduse=T){
   # 
   # open [filename] and read [varname]
   # returns array (ntime, npoints)
+  if (reduse){
+    system(sprintf("fimex --extract.selectVariables %s --input.file %s --input.type netcdf  --output.file tmp.nc",varname, file))
+	file    = "tmp.nc"
+  }
   ncid      = nc_open(file)
   npoints   = ncid$dim$Number_of_points$len
   # time from ncid
@@ -102,23 +106,30 @@ get_var <- function(file, varname){
   dimnames(var)[[2]] = c(sprintf("point_%d",1:npoints))
   dimnames(var)[[1]] = num_times
   stat = nc_close(ncid)
+  system("rm -f tmp.nc")
   return(var)
 }
 
 #### get_analysis ####
-get_analysis <- function(file, varname){
+get_analysis <- function(file, varname,reduse=T){
   #
   # read ISBA_PROGNOSTICS.OUT.NC created by homemade EnKF
   # 
+  filename = file
+  if (reduse){
+    system(sprintf("fimex --extract.selectVariables %s --input.file %s --input.type netcdf --output.file tmp.nc",varname, file))
+    file    = "tmp.nc"
+  }
   ncid       = nc_open(file)
   npoints    = ncid$dim$Number_of_points$len
-  filename   = ncid$filename
+# filename   = ncid$filename
   yyyymmddhh = gsub(".nc", "", gsub(".*nc_", "", filename))
   num_times  = as.numeric(strsplit(yyyymmddhh,split="_")[[1]][1])
   var        = t(ncvar_get(ncid, ncid$var[[varname]]))
   dimnames(var)[[2]] = c(sprintf("point_%d",1:npoints))
   dimnames(var)[[1]] = num_times
   stat = nc_close(ncid)
+  system("rm -f tmp.nc")
   return(var)
 }
 

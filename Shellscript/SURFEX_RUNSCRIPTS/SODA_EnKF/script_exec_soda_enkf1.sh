@@ -41,7 +41,7 @@ RR=`echo $AAAAMMJJRR | cut -c9-10`
 #end of simulation
 #AAAAMMJJRR_end=2016050400
 
-AAAAMMJJRR_end=2016050100
+AAAAMMJJRR_end=2016101700
 
 #./GET_CANARI.sh $RUNDIR "july_2012" $aa $mm $jj $RR # What does EXP2 do here?!!!!!!
 

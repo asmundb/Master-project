@@ -1,3 +1,5 @@
+#!/usr/bin/Rscript
+
 # Load variables from nc files and saves result to .dat
 #
 source("functions.R")
@@ -12,9 +14,10 @@ nargs <- length(args)
 
 path.nc  <- args[1]                   # path to nc model output
 file.out <- args[2]                   # path to save to
-var      <- args[3]                   # surfex variable name
-data     <- args[4]
-
+#var      <- args[3]                   # surfex variable name
+#data     <- args[3]
+var  <- regmatches(file.out,regexec("\\/([[:alnum:]]*)\\.",file.out))[[1]][2]
+data <- regmatches(file.out,regexec("\\.([[:alnum:]]*)\\.",file.out))[[1]][2]
 
 saveOpe  <- F     # if true save openloop to file
 saveObs  <- F     # if true save observations to file
@@ -34,6 +37,11 @@ if ( data == "analysis" ){
   print("unknown data")
   stop()
 }
+print(path.nc)
+print(file.out)
+print(var)
+print(data)
+
 
 #saveOpe  <- as.logical(args[4])       # if true save openloop to file
 #saveObs  <- as.logical(args[5])       # if true save observations to file
@@ -42,15 +50,13 @@ if ( data == "analysis" ){
 
 ########################################################################
 
-
-
 ########################################################################
 # List nc files
-files.analysis  <- list.files(path=paste(path.nc,"analysis",sep=""),full.name=T) # test if nc mabye
+files.analysis  <- list.files(path=paste(path.nc,"analysis",sep="/"),full.name=T) # test if nc mabye
 nfiles.analysis <- length(files.analysis)
-files.offline   <- list.files(path=paste(path.nc,"offline",sep=""),full.name=T)
+files.offline   <- list.files(path=paste(path.nc,"offline",sep="/"),full.name=T)
 nfiles.offline  <- length(files.offline)
-files.openloop   <- list.files(path=paste(path.nc,"openloop",sep=""),full.name=T)
+files.openloop   <- list.files(path=paste(path.nc,"openloop",sep="/"),full.name=T)
 nfiles.openloop  <- length(files.openloop)
 
 # check if ensemble
@@ -130,20 +136,43 @@ if (saveOff){
 flush.console()
 cat("\n")
 
+
+
 if (saveOpe){
   flush.console()
   cat("\r","reading openloop...                     ")
   # openloop
   var.openloop <- list()
   pb <- txtProgressBar(min = 0, max = nfiles.openloop, style = 3)
-  var.openloop[[1]] <- get_var(files.openloop[1],var)
-  for (i in 22:nfiles.openloop){
-	  var.openloop[[1]] <- rbind(var.openloop[[1]], get_var(files.openloop[i],var))
-	  setTxtProgressBar(pb, i)
+  for (prt in 1:nprt){
+    var.openloop[[prt]] <- get_var(files.openloop[prt],var)
+    setTxtProgressBar(pb, prt)
+  }
+  if (nfiles.openloop > nprt){
+    for (i in (nprt+1):nfiles.openloop){
+      var.openloop[[prt]] <- rbind(var.openloop[[prt]], get_var(files.openloop[i],var))
+      prt <- prt+1
+      if (prt > nprt) { prt <- 1}
+      setTxtProgressBar(pb, i)
+    }
   }
   close(pb)
   var.openloop  <- prt2pntReshape(var.openloop)
 }
+
+#  flush.console()
+#  cat("\r","reading openloop...                     ")
+#  # openloop
+#  var.openloop <- list()
+#  pb <- txtProgressBar(min = 0, max = nfiles.openloop, style = 3)
+#  var.openloop[[1]] <- get_var(files.openloop[1],var)
+#  for (i in 22:nfiles.openloop){
+#	  var.openloop[[1]] <- rbind(var.openloop[[1]], get_var(files.openloop[i],var))
+#	  setTxtProgressBar(pb, i)
+#  }
+#  close(pb)
+#  var.openloop  <- prt2pntReshape(var.openloop)
+#}
 flush.console()
 cat("\n")
 
