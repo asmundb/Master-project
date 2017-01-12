@@ -1,50 +1,43 @@
-PATH_enkf=/home/asmundb/SURFEX2/EXPERIMENTS/SODA_EnKF/time_series/
-PATH_ekf=/home/asmundb/SURFEX2/EXPERIMENTS/SODA_EKF/time_series/
-PATH_homemade=/home/asmundb/SURFEX2/EXPERIMENTS/homemade/time_series/
-PATH_DIF=/home/asmundb/SURFEX2/EXPERIMENTS/SODA_DIF/time_series/
-PATH_obs=/disk1/asmundb/SMOS/OBSERVATIONS/
+SHELL := /bin/bash # Use bash syntax
 
-VAR=WG1
+PATH1=/disk1/asmundb/results2
+PATH_enkf=$(PATH1)/enkf_5/
+PATH_ekf=$(PATH1)/ekf/
+PATH_obs=/disk1/asmundb/SMOS/OBSERVATIONS/
+DATDIR=dat/postMod
+
+#VAR=WG3
 
 
 #prog=R CMD BATCH
-prog=Rscript
-runopt= >/dev/null
+prog= #Rscript
+runopt=  #>/dev/null
 
 
 .PHONY : all
-all: enkfdats ekfdats homemadedats obsdats difdats
+all: ekfdats enkfdats obsdats 
 
-.PHONY : difdats
-difdats: dat/DIF/*.dat
-
-dat/DIF/$(VAR).%.dat: $(PATH_DIF)/%/*
-	$(prog) read_timeseries_output.R $(PATH_DIF) $@ $(VAR) $* $(runopt)
-
-
+### EnKF dat files
 .PHONY : enkfdats
-enkfdats: dat/EnKF/*.dat 
+enkfdats: $(DATDIR)/EnKF/*.dat read_timeseries_output.R
 
-dat/EnKF/$(VAR).%.dat: $(PATH_enkf)/%/*
-	$(prog) read_timeseries_output.R $(PATH_enkf) $@ $(VAR) $* $(runopt)
+$(DATDIR)/EnKF/%.dat: $(PATH_enkf)/**/* read_timeseries_output.R
+	$(prog) ./read_timeseries_output.R $(PATH_enkf) $@ $(runopt)
 
+### EKF dat files
 .PHONY : ekfdats
-ekfdats: dat/EKF/*.dat
+ekfdats: $(DATDIR)/EKF/*.dat read_timeseries_output.R
 
-dat/EKF/$(VAR).%.dat: $(PATH_ekf)/%/*
-	$(prog) read_timeseries_output.R $(PATH_ekf) $@ $(VAR) $* $(runopt)
+$(DATDIR)/EKF/%.dat: $(PATH_ekf)/**/* read_timeseries_output.R
+	$(prog) ./read_timeseries_output.R $(PATH_ekf) $@ $(runopt)
 
-.PHONY : homemadedats
-homemadedats: dat/homemade/*.dat
 
-dat/homemade/$(VAR).%.dat: $(PATH_homemade)/%/*
-	$(prog) read_timeseries_output.R $(PATH_homemade) $@ $(VAR) $* $(runopt)
+### obs dat files
+.PHONY : obsdats 
+obsdats: dat/obs/*.dat read_timeseries_output.R
 
-.PHONY : obsdats
-obsdats: dat/obs/*.dat
-
-dat/obs/$(VAR).%.dat: $(PATH_obs)/*
-	$(prog) read_timeseries_output.R $(PATH_ekf) $@ $(VAR) $* $(runopt)
+dat/obs/%.dat: $(PATH_obs)/* read_timeseries_output.R
+	$(prog) ./read_timeseries_output.R $(PATH_ekf) $@ $(runopt)
 
 
 # Automated variables
@@ -56,6 +49,10 @@ dat/obs/$(VAR).%.dat: $(PATH_obs)/*
 #.PHONY : clean
 #clean:
 	
+.PHONY: variable
+variable:
+	@echo ${PATH}
+
 
 ## self documenting makefile
 #.PHONY : help
