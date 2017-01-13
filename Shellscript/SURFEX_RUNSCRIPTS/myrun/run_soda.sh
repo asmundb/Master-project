@@ -180,7 +180,7 @@ ln -sf $SRC_SURFEX/MY_RUN/ECOCLIMAP/*.dat .
 cp  $expdir/OUTPUT/PGD_SODA.$suffix .
 
 # Link observations
-if [[ "$analysis" == true && -f $expdir/OBSERVATIONS/OBSERVATIONS_${YY_RES}${MM_RES}${DD_RES}H${HH_RES}.DAT ]]; then
+if [[ "$analysis" == "true" && -f $expdir/OBSERVATIONS/OBSERVATIONS_${YY_RES}${MM_RES}${DD_RES}H${HH_RES}.DAT ]]; then
   ln -sf $expdir/OBSERVATIONS/OBSERVATIONS_${YY_RES}${MM_RES}${DD_RES}H${HH_RES}.DAT .
   echo "SMOS copied"
 else 
