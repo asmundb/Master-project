@@ -9,8 +9,8 @@ source("functions.R")
 #map(plot=T, xlim=c(min(lon),max(lon)), ylim=c(min(lat),max(lat)))
 
 # Norway
-xl <- c(5,17)
-yl <- c(58,65)
+xl <- c(5,18)
+yl <- c(58,68)
 
 # World
 #xl <- c(min(lon),max(lon))
@@ -42,10 +42,10 @@ image(     x=lon[lon_range],
 		   z=Soil_moisture_D[lon_range, lat_range],
 		   xlim=c(min(lon[lon_range]),max(lon[lon_range])),
 		   ylim=c(min(lat[lat_range]),max(lat[lat_range])))
-dev.off()
+#dev.off()
 
 #dev.new()
-pdf("stat_map.pdf")
+pdf("SMOS_heatmap_norway.pdf")
 
 map(plot=T, xlim=xl, ylim=yl)
 
@@ -64,6 +64,6 @@ image(x=lon[lon_range],
 #dev.off()
 stas <- read_stlist("stationlist.cfg")
 
-points(x=stas[,2], y=stas[,3])
-text(stas[,2],stas[,3],labels=dimnames(stas)[[1]],pos=4)
+points(x=stas[,2], y=stas[,3],pch=23, bg="orange", cex=2)
+#text(stas[,2],stas[,3],labels=dimnames(stas)[[1]],pos=4)
 dev.off()
