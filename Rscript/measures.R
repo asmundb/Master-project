@@ -44,8 +44,14 @@ nobs <- colSums( !apply(obs$vals, c(1,3), is.na))
 plot(NA, xlim=c(0, obs$dims[1]), ylim=c(0,0.6) )
 col = rainbow(8)
 for (pnt in 1:obs$dim[3]){
-  points(1:obs$dims[1], obs$vals[,1,pnt], col=col[pnt])
-  lines(MM(obs$vals[,,pnt], 5), col=col[pnt])
+  pdf(sprintf("figures/SMOS_totlal_%d.pdf", pnt))
+  plot(NA, xlim=c(0, obs$dims[1]), ylim=c(0,0.6),
+           main=sprintf("%s",dimnames(stations)[[1]][pnt]),
+		   xlab="time index",
+		   ylab="Soil moisture")
+  points(1:obs$dims[1], obs$vals[,1,pnt], pch=20,cex=0.4)
+  lines(MM(obs$vals[,,pnt], 5))
+  dev.off()
 }
-legend("topright", legend=dimnames(stations)[[1]], fill=col)
+#legend("topright", legend=dimnames(stations)[[1]], fill=col)
 
