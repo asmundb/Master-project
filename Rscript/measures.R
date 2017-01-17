@@ -73,8 +73,13 @@ linReScale <- function(x,y){
   x_mean  = mean(x,na.rm=T)
   y_mean  = mean(y,na.rm=T)
   x_new = (x - x_mean)*(sigma_y/sigma_x) + y_mean
-  print(sprintf("sd_x=%.3f, sd_y=%.3f, mean_x=%.3f, mean_y=%.3f",
-                 sigma_x, sigma_y, x_mean, y_mean))
+  cat(sprintf("=========== STATION: %d =============\n", pnt))
+  cat(sprintf("old min  : %5.3f | old max  : %.3f \n",min(x,na.rm=T)  , max(x,na.rm=T)))
+  cat(sprintf("model min: %5.3f | model max: %.3f \n",min(y,na.rm=T)  , max(y,na.rm=T)))
+  cat(sprintf("new min  : %5.3f | new max  : %.3f \n",min(x_new,na.rm=T) , max(x_new,na.rm=T)))
+
+#  print(sprintf("sd_x=%.3f, sd_y=%.3f, mean_x=%.3f, mean_y=%.3f",
+#                 sigma_x, sigma_y, x_mean, y_mean))
   return(x_new)
 }  
 
@@ -83,18 +88,20 @@ linReScale <- function(x,y){
 for (pnt in 1:8){
 
 obs_new <- linReScale(obs$vals[,,pnt], openloop$vals[,,pnt])
+pdf(sprintf("figures/SMOS_obs/SMOS_normalised_%d.pdf", pnt))
 
-plot(NA, xlim=c(0, oopenloop$dims[1]), ylim=c(0,0.6),
+plot(NA, xlim=c(0, openloop$dims[1]), ylim=c(0,0.6),
+
           main=sprintf("%s",dimnames(stations)[[1]][pnt]),
           xlab="time index",
           ylab="Soil moisture")
-points( obs$vals[,1,pnt], col="blue", pch=20,cex=0.5)
-lines(openloop$vals[,,pnt])
-points( obs_new, col="red", pch=20,cex=0.5)
-lines(MM(obs$vals[,,pnt],5), col="blue")
-lines(MM(obs_new,5),col="red")
+points(obs$put, obs$vals[,1,pnt], col="blue", pch=20,cex=0.5)
+lines(openloop$put, openloop$vals[,,pnt])
+points(obs$put, obs_new, col="red", pch=20,cex=0.5)
+lines(obs$put, MM(obs$vals[,,pnt],5), col="blue")
+lines(obs$put, MM(obs_new,5),col="red")
 
 legend("topright", legend=c("openloop","SMOS","SMOS-norm"), fill=c("black","blue","red"))
-
-Sys.sleep(4)
+dev.off()
+#Sys.sleep(4)
 }
