@@ -5,20 +5,6 @@
 source("functions.R")
 source("plotTimeSerieOO.R")
 
-MM <- function(x,n){
-# Clalculate moving mean for x around i-n:i+n
-  N  = length(x) + 2*n-1
-  mm = numeric(length=N)
-  x  = c(rep(NA,n), x, rep(NA,n))
-  for (i in n:(N-n)){
-    wn = sum(!is.na(x[(i-n):(i+n)]))
-    mm[i] = sum(x[(i-n):(i+n)], na.rm=T)/(wn)
-  } 
-  return(mm[n:(N-n)])
-}
-
-
-
 Tstart <- 2016050100
 Tend   <- 2016101700
 
@@ -61,47 +47,69 @@ for (pnt in 1:obs$dim[3]){
 }
 
 
-#### NORMALISERING ####
+######################## NORMALISERING ########################################
 
 openloop <- sodaType("dat/postMod/EKF/WG2.openloop.dat", Tstart, Tend)
-
-
-linReScale <- function(x,y){
-  # Return rescaled x to y's mean and spread
-  sigma_x = sd(x,na.rm=T)
-  sigma_y = sd(y,na.rm=T)
-  x_mean  = mean(x,na.rm=T)
-  y_mean  = mean(y,na.rm=T)
-  x_new = (x - x_mean)*(sigma_y/sigma_x) + y_mean
-  cat(sprintf("=========== STATION: %d =============\n", pnt))
-  cat(sprintf("old min  : %5.3f | old max  : %.3f \n",min(x,na.rm=T)  , max(x,na.rm=T)))
-  cat(sprintf("model min: %5.3f | model max: %.3f \n",min(y,na.rm=T)  , max(y,na.rm=T)))
-  cat(sprintf("new min  : %5.3f | new max  : %.3f \n",min(x_new,na.rm=T) , max(x_new,na.rm=T)))
-
-#  print(sprintf("sd_x=%.3f, sd_y=%.3f, mean_x=%.3f, mean_y=%.3f",
-#                 sigma_x, sigma_y, x_mean, y_mean))
-  return(x_new)
-}  
 
 
 
 for (pnt in 1:8){
 
+obs_new_A <- linReScale(obs$vals[ascend,,pnt], openloop$vals[,,pnt])
+obs_new_D <- linReScale(obs$vals[descend,,pnt], openloop$vals[,,pnt])
 obs_new <- linReScale(obs$vals[,,pnt], openloop$vals[,,pnt])
-pdf(sprintf("figures/SMOS_obs/SMOS_normalised_%d.pdf", pnt))
+
+pdf(sprintf("figures/SMOS_obs/SMOS_linRe_sep_%d.pdf", pnt))
 
 plot(NA, xlim=c(0, openloop$dims[1]), ylim=c(0,0.6),
 
           main=sprintf("%s",dimnames(stations)[[1]][pnt]),
           xlab="time index",
           ylab="Soil moisture")
-points(obs$put, obs$vals[,1,pnt], col="blue", pch=20,cex=0.5)
+#points(obs$put, obs$vals[,1,pnt], col="blue", pch=20,cex=0.5)
 lines(openloop$put, openloop$vals[,,pnt])
-points(obs$put, obs_new, col="red", pch=20,cex=0.5)
-lines(obs$put, MM(obs$vals[,,pnt],5), col="blue")
-lines(obs$put, MM(obs_new,5),col="red")
 
-legend("topright", legend=c("openloop","SMOS","SMOS-norm"), fill=c("black","blue","red"))
+#points(obs$put[ascend], obs_new_A, col="red", pch=20,cex=0.5)
+
+lines(obs$put, MM(obs_new,5), col="red")
+lines(obs$put, MM(obs$vals[,,pnt],5), col="darkred")
+lines(obs$put[ascend], MM(obs$vals[ascend,,pnt],5), col="darkblue")
+lines(obs$put[descend], MM(obs$vals[descend,,pnt],5), col="darkgreen")
+lines(obs$put[ascend], MM(obs_new_A,5),col="blue")
+lines(obs$put[descend], MM(obs_new_D,5),col="green")
+
+legend("topright", legend=c("openloop","SMOS_norm","SMOS","SMOS_A","SMOS_D","SMOS_A_norm","SMOS_D_norm"), 
+                     fill=c("black","red","darkred","darkblue","darkgreen","blue","green"))
 dev.off()
 #Sys.sleep(4)
 }
+
+
+##################### RESCALE AND SAVE AS OBSERVATIONS.DAT #####################
+
+obs_new <- array(dim=c(obs$dims[1],8))
+
+for (pnt in 1:8){
+  obs_new[,pnt] <- minReScale(obs$vals[,,pnt], openloop$vals[,,pnt])
+}
+
+obs_new[which(is.na(obs_new))] <- 999
+
+
+
+
+#for (i in 1:length(obs_new)){
+#  yyyymmddhh <- as.character(obs$time[i])
+#  yy <- substr(yyyymmddhh, 3,4)
+#  mm <- substr(yyyymmddhh, 5,6)
+#  dd <- substr(yyyymmddhh, 7,8)
+#  hh <- substr(yyyymmddhh, 9,10)
+#  outfile <- sprintf("OBSERVATIONS_LINRESCALE/OBSERVATIONS_%s%s%sH%s.DAT", yy,mm,dd,hh)
+#  write(obs_new[i,], outfile, ncolumns=1)
+#}
+
+
+
+
+
+

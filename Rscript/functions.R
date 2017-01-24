@@ -1,5 +1,6 @@
 #Functions
 
+
 #### nn ####
 nn <- function(i,j,I,J){
   # return nearest neighbour
@@ -153,3 +154,54 @@ prt2pntReshape <- function(x){
   dimnames(xx)[[3]] <- dimnames(x[[1]])[[2]]
   return(xx)
 }
+
+
+##### STATISTICAL #####
+
+MM <- function(x,n){
+# Clalculate moving mean for x around i-n:i+n
+  N  = length(x) + 2*n-1
+  mm = numeric(length=N)
+  x  = c(rep(NA,n), x, rep(NA,n))
+  for (i in n:(N-n)){
+    wn = sum(!is.na(x[(i-n):(i+n)]))
+    mm[i] = sum(x[(i-n):(i+n)], na.rm=T)/(wn)
+  }
+  return(mm[n:(N-n)])
+}
+
+linReScale <- function(x,y){
+  # Return rescaled x to y's mean and spread
+  sigma_x = sd(x,na.rm=T)
+  sigma_y = sd(y,na.rm=T)
+  x_mean  = mean(x,na.rm=T)
+  y_mean  = mean(y,na.rm=T)
+  x_new = (x - x_mean)*(sigma_y/sigma_x) + y_mean
+#  cat(sprintf("=========== STATION: %d =============\n", pnt))
+#  cat(sprintf("old min  : %5.3f | old max  : %.3f \n",min(x,na.rm=T)  , max(x,na.rm=T)))
+#  cat(sprintf("model min: %5.3f | model max: %.3f \n",min(y,na.rm=T)  , max(y,na.rm=T)))
+#  cat(sprintf("new min  : %5.3f | new max  : %.3f \n",min(x_new,na.rm=T) , max(x_new,na.rm=T)))
+  return(x_new)
+}
+
+
+minMaxReScale <- function(x,y){
+  # scale to min max
+  x_max <- max(x,na.rm=T)
+  x_min <- min(x,na.rm=T)
+  y_max <- max(y,na.rm=T)
+  y_min <- min(y,na.rm=T)
+  x_new <- (x-x_min)*(y_max-y_min)/(x_max-x_min) + y_min
+  return(x_new)
+}
+
+minReScale <- function(x,y){
+  # scale to min max
+  x_max <- max(x,na.rm=T)
+  x_min <- min(x,na.rm=T)
+  y_max <- max(y,na.rm=T)
+  y_min <- min(y,na.rm=T)
+  x_new <- (x-x_min)*(1-y_min)/(x_max-x_min) + y_min
+  return(x_new)
+}
+
