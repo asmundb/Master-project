@@ -187,10 +187,10 @@ linReScale <- function(x,y){
 
 minMaxReScale <- function(x,y){
   # scale to min max
-  x_max <- max(x,na.rm=T)
-  x_min <- min(x,na.rm=T)
-  y_max <- max(y,na.rm=T)
-  y_min <- min(y,na.rm=T)
+  x_max <- quantile(x,c(0.99),na.rm=T) #max(x,na.rm=T)
+  x_min <- quantile(x,c(0.01),na.rm=T) #min(x,na.rm=T)
+  y_max <- quantile(y,c(0.99),na.rm=T) #max(y,na.rm=T)
+  y_min <- quantile(y,c(0.01),na.rm=T) #min(y,na.rm=T)
   x_new <- (x-x_min)*(y_max-y_min)/(x_max-x_min) + y_min
   return(x_new)
 }

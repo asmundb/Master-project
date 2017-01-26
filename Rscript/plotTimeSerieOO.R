@@ -65,11 +65,14 @@ sodaType <- function(file, Tstart=2016050100, Tend=2016101700){
     vals <- array(dim=c(dim(case[case_ind,,])[1], dim(case)[2], dim(case)[3]))
     vals[,,] <- case[case_ind,,]
   }
+  stations<- read_stlist(stationlist="/home/asmundb/Master-project/Rscript/stationlist.cfg")
+  stnames <- dimnames(stations)[[1]]
   sodaType <- list(  vals=vals,
                      time=case_time[case_ind],
   	                 put=case_put,
 					 dims=dim(vals),
-					 ndim=length(dim(case)) )
+					 ndim=length(dim(case)),
+					 stname=stnames)
 
   class(sodaType) <- append(class(sodaType), "sodaType")
   

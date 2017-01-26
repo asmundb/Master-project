@@ -4,7 +4,7 @@ PATH1=/disk1/asmundb/results2
 PATH_enkf=$(PATH1)/enkf_5/
 PATH_ekf=$(PATH1)/ekf/
 PATH_obs=/disk1/asmundb/SMOS/OBSERVATIONS/
-DATDIR=dat/postMod
+DATDIR=dat/normSMOS
 
 #VAR=WG3
 
