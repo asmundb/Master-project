@@ -2,8 +2,8 @@
 
 #
 # TEST of SODA with smos data
-# 
-#set -x
+ 
+set -x
 ################################
 ### USER DEPENDENT VARIABLE ####
 ################################

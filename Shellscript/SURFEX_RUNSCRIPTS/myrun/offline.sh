@@ -13,14 +13,6 @@ case $exp in
   "ENKF")
     kind="ENS"
   ;;
-  "OPENLOOP")
-    if [[ $3 -lt 1 ]]; then
-      kind="PERT"
-	  LPRT=".FALSE"
-    else 
-	  kind="ENS"
-    fi
-  ;;
   *)
     echo "what?"
   ;;
@@ -80,18 +72,16 @@ cat $expdir/NAMELISTS/OPTIONS.nam_offline                \
 
 case $exp in
   "ENKF")
-    sed -e "s/NIE = 0/NIE = $pert/g" OPTIONS.nam.tmp > OPTIONS.nam.tmp1
+    sed -e "s/NIE = 0/NIE = $pert/g" \
+	    -e "s/LPRT=LPRT/LPRT=.FALSE./g"   OPTIONS.nam.tmp > OPTIONS.nam.tmp1
   ;;
   "EKF")
-    sed -e "s/NIVAR=NIVAR/NIVAR=$IVAR/" OPTIONS.nam.tmp > OPTIONS.nam.tmp1
-  ;;
-  "OPENLOOP")
-    sed -e "s/NIE = 0/NIE = $pert/g" OPTIONS.nam.tmp > OPTIONS.nam.tmp1
+    sed -e "s/NIVAR=NIVAR/NIVAR=$IVAR/" \
+	    -e "s/LPRT=LPRT/LPRT=$LPRT/g"     OPTIONS.nam.tmp > OPTIONS.nam.tmp1
   ;;
 esac
 
-sed -e "s/LPRT=LPRT/LPRT=$LPRT/g"        \
-    -e "s/LASSIM=.TRUE./LASSIM=.FALSE./" \
+sed -e "s/LASSIM=.TRUE./LASSIM=.FALSE./" \
     OPTIONS.nam.tmp1 > OPTIONS.nam.tmp
 cat $expdir/NAMELISTS/OPTIONS.nam_$suffix OPTIONS.nam.tmp > OPTIONS.nam
 eval `grep NVAR OPTIONS.nam | sed 's/,//' `
