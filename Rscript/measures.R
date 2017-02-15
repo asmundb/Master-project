@@ -89,28 +89,31 @@ openloop <- sodaType("dat/postMod/EKF/WG2.openloop.dat", Tstart, Tend)
 
 ##################### RESCALE AND SAVE AS OBSERVATIONS.DAT #####################
 
-#obs_new <- array(dim=c(obs$dims[1],8))
+obs_new <- array(dim=c(obs$dims[1],8))
 
-#for (pnt in 1:8){
-#  obs_new[,pnt] <- linReScale(obs$vals[,,pnt], openloop$vals[,,pnt])
-#}
-#dimnames(obs_new)[[1]] <- obs$time
+for (pnt in 1:8){
+  obs_new[,pnt] <- linReScale(obs$vals[,,pnt], openloop$vals[,,pnt])
+}
+dimnames(obs_new)[[1]] <- obs$time
 
-#obs_new[which(is.na(obs_new))] <- 999
+obs_new[which(is.na(obs_new))] <- 999
 
 
 #saveRDS(obs_new, file="dat/normSMOS/EKF/WG2.obs.dat")
 
 
-#for (i in 1:length(obs_new)){
-#  yyyymmddhh <- as.character(obs$time[i])
-#  yy <- substr(yyyymmddhh, 3,4)
-#  mm <- substr(yyyymmddhh, 5,6)
-#  dd <- substr(yyyymmddhh, 7,8)
-#  hh <- substr(yyyymmddhh, 9,10)
-#  outfile <- sprintf("OBSERVATIONS_LINRESCALE/OBSERVATIONS_%s%s%sH%s.DAT", yy,mm,dd,hh)
-#  write(obs_new[i,], outfile, ncolumns=1)
-#}
+for (i in 1:length(obs_new)){
+  yyyymmddhh <- as.character(obs$time[i])
+#  print(yyyymmddhh)
+  yy <- substr(yyyymmddhh, 3,4)
+  mm <- substr(yyyymmddhh, 5,6)
+  dd <- substr(yyyymmddhh, 7,8)
+  hh <- substr(yyyymmddhh, 9,10)
+  outfile <- sprintf("/disk1/asmundb/SMOS/OBSERVATIONS_LINRESCALE2/OBSERVATIONS_%s%s%sH%s.DAT", yy,mm,dd,hh)
+  cat(outfile, obs_new[i,],"\n")
+  write(obs_new[i,], outfile, ncolumns=1)
+  Sys.sleep(0.1)
+}
 
 
 ################### Density plot ####################

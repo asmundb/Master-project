@@ -3,7 +3,7 @@
 #
 # TEST of SODA with smos data
  
-set -x
+#set -x
 ################################
 ### USER DEPENDENT VARIABLE ####
 ################################
@@ -251,7 +251,7 @@ case $exp in
         $expdir/NAMELISTS/OPTIONS.nam_obs             \
         $expdir/NAMELISTS/OPTIONS.nam_io_varassim_ekf \
         $expdir/NAMELISTS/OPTIONS.nam_EKF    > OPTIONS.nam.tmp
-    sed -e "s/LBEV=LBEV/LBEV=.FALSE./" \
+    sed -e "s/LBEV=LBEV/LBEV=.TRUE./" \
         -e "s/LPRT=LPRT/LPRT=.FALSE./" \
         -e "s/LSIM=LSIM/LSIM=.FALSE./" \
         -e "s/NIVAR=NIVAR/NIVAR=1/" \
@@ -296,6 +296,7 @@ case $exp in
   ;;
   "ENKF")
     cp $expdir/RUN/RUN_ENKF/SURFEX_RESULTS $expdir/RESULTS/ANALYSIS/$dtgtmp/
+	cp $expdir/RUN/RUN_ENKF/*.0000001 $expdir/RESULTS/ANALYSIS/$dtgtmp/
 	enss=1
     for ens in $(seq -f "%02g" 1 $npert); do
       cp $expdir/RUN/RUN_OFFLINE_ENS_$ens/ISBA_PROGNOSTIC.OUT.nc  \

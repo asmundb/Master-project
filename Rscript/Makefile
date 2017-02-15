@@ -16,7 +16,6 @@ runopt=  #>/dev/null
 
 .PHONY : all
 all: ekfdats enkfdats obsdats 
-
 ### EnKF dat files
 .PHONY : enkfdats
 enkfdats: $(DATDIR)/EnKF/*.dat read_timeseries_output.R

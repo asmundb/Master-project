@@ -8,8 +8,8 @@ source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX
 ########################################################
 ############ USER INPUT ################################
 start=2016050100
-end=2016051400
-#end=2016101700
+#end=2016050106
+end=2016101700
 
 
 # Usage:
@@ -72,7 +72,7 @@ mkdir RESULTS/ISBA
 dtg=$start
 mode=3
 
-
+cp NAMELISTS/OPTIONS.nam_ENKF_1  NAMELISTS/OPTIONS.nam_ENKF
 while [ $dtg -lt $end ]; do
 
 
@@ -86,6 +86,8 @@ while [ $dtg -lt $end ]; do
 
   ./run_soda.sh $exp $dtg $mode $NENS $analysis || exit 1
 
+  sed -e "s/LENS_GEN = T/LENS_GEN = F/g" NAMELISTS/OPTIONS.nam_ENKF_1 > NAMELISTS/OPTIONS.nam_ENKF
+
 #  if [[ "$analysis" = "yes" ]]; then
 #    cp $expdir/RUN/RUN_OFFLINE_PERT_00/ISBA_PROGNOSTIC.OUT.nc $outpath/offline/ISBA_PROGNOSTIC.OUT.nc_$dtg || exit 1
 #    cp $expdir/RUN/RUN_EKF/ISBA_PROGNOSTIC.OUT.nc $outpath/analysis/soda_analysis.nc_$dtg2 || exit 1
@@ -94,6 +96,7 @@ while [ $dtg -lt $end ]; do
 #    cp $expdir/RUN/RUN_OFFLINE/ISBA_PROGNOSTIC.OUT.nc $outpath/$offdir/ISBA_PROGNOSTIC.OUT.nc_$dtg || exit 1
 #	mv $expdir/OUTPUT/PREP_OFFLINE.nc $expdir/OUTPUT/PREP_SODA.nc || exit 1
 #  fi
+  
 
   mode=0
   dtgtmp=$dtg
