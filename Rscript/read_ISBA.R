@@ -74,6 +74,8 @@ unitize <- function(x){
 }
 
 
+stlst <- read_stlist(stationlist="stationlist.cfg")
+
 
 
 diag_vars <- c("T2M_ISBA", "Q2M_ISBA","GFLUX_ISBA","H_ISBA","LE_ISBA","RN_ISBA")
@@ -110,5 +112,17 @@ lines(unitize(diag_ekf$var$LE_ISBA[,pnt] - diag_ol$var$LE_ISBA[,pnt]), col="gree
 
 
 # regimes
-plot(prog_ol$var$WG1[,8], diag_ol$var$LE_ISBA[,8]/abs(diag_ol$var$RN_ISBA[,8]), ylim=c(0,7), xlab="soil moisture", ylab="LE/RN")
 
+wp=0.213320
+fc=0.356612
+
+for (i in 1:8){
+  pdf(sprintf("EF_%d.pdf",i))
+  plot(prog_ol$var$WG1[,i],
+       diag_ol$var$LE_ISBA[,i]/abs(diag_ol$var$RN_ISBA[,i]), ylim=c(0,7),
+       xlab="soil moisture", ylab="LE/RN",
+	   main=dimnames(stlst)[[1]][i])
+  abline(v=wp, col="red")
+  abline(v=fc, col="red")
+  dev.off()
+}
