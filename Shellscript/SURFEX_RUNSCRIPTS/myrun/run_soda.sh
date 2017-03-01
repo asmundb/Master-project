@@ -251,7 +251,7 @@ case $exp in
         $expdir/NAMELISTS/OPTIONS.nam_obs             \
         $expdir/NAMELISTS/OPTIONS.nam_io_varassim_ekf \
         $expdir/NAMELISTS/OPTIONS.nam_EKF    > OPTIONS.nam.tmp
-    sed -e "s/LBEV=LBEV/LBEV=.TRUE./" \
+    sed -e "s/LBEV=LBEV/LBEV=.FALSE./" \
         -e "s/LPRT=LPRT/LPRT=.FALSE./" \
         -e "s/LSIM=LSIM/LSIM=.FALSE./" \
         -e "s/NIVAR=NIVAR/NIVAR=1/" \

@@ -182,8 +182,10 @@ make_plots <- function(CASE, pnt, path){
   ## KALMAN GAIN
 
   pdf(paste(path,"/ekf_box_Kgain.pdf",sep=""))
-  x <- apply(ekf$Kg[,,pnt], 2, as.numeric)
+  x <- rm_null(apply(ekf$Kg[,,pnt], 2, as.numeric))
   boxplot(rm_null(x), ylim=c(-0.002,0.033))
+  xmeans <- colMeans(x,na.rm=T)
+  points(xmeans, pch=5)
   title(main="sekf Kalman gain matrix",
         xlab="Soil layer")
   dev.off()
@@ -191,6 +193,8 @@ make_plots <- function(CASE, pnt, path){
   pdf(paste(path,"/enkf_box_Kgain.pdf",sep=""))
   x <- apply(enkf$Kg[,,pnt], 2, as.numeric)
   boxplot(rm_null(x),ylim=c(-0.2,0.3))
+  xmeans <- colMeans(x,na.rm=T)
+  points(xmeans, pch=5)
   title(main="enkf Kalman gain matrix",
         xlab="Soil layer")
   dev.off()
@@ -201,6 +205,8 @@ make_plots <- function(CASE, pnt, path){
   pdf(paste(path,"/ekf_box_jac.pdf",sep=""))
   x <- apply(ekf$Ho[,,pnt], 2, as.numeric)
   boxplot(rm_null(x), ylim=c(-0.1,0.95))
+  xmeans <- colMeans(x,na.rm=T)
+  points(xmeans, pch=5)
   title(main="sekf Jacobian H matrix",
         xlab="Soil layer")
   dev.off()
@@ -210,6 +216,8 @@ make_plots <- function(CASE, pnt, path){
   pdf(paste(path,"/ekf_box_increment.pdf",sep=""))
   x <- apply(ekf$inc[,,pnt], 2, as.numeric)
   boxplot(rm_null(x),ylim=c(-0.0012,0.0032))
+  xmeans <- colMeans(x,na.rm=T)
+  points(xmeans, pch=5)
   title(main="sekf Increment",
         xlab="Soil layer")
   dev.off()
@@ -217,6 +225,8 @@ make_plots <- function(CASE, pnt, path){
   pdf(paste(path,"/enkf_box_increment.pdf",sep=""))
   x <- apply(enkf$inc[,,pnt], 2, as.numeric)
   boxplot(rm_null(x),ylim=c(-0.02,0.02))
+  xmeans <- colMeans(x,na.rm=T)
+  points(xmeans, pch=5)
   title(main="enkf Increment",
         xlab="Soil layer")
   dev.off()
@@ -367,14 +377,15 @@ make_plots <- function(CASE, pnt, path){
 
  CASE2 <- list( ol=ol, ol_ens=ol_ens, ekf=ekf, enkf=enkf)
 
-
+ # evolving B matrix initial CASE3
+ ekf<- read_ANAL_INC("/disk1/asmundb/RESULTS/B_sensTest/CASE3/ekf/ANALYSIS")
  ol_ens <- read_SURFEX_RESULT("/disk1/asmundb/RESULTS/B_sensTest/CASE3/openloop_ens_5/ANALYSIS/")
  enkf <- read_SURFEX_RESULT("/disk1/asmundb/RESULTS/B_sensTest/CASE3/enkf_5/ANALYSIS/")
 
 
  CASE3 <- list( ol=ol, ol_ens=ol_ens, ekf=ekf, enkf=enkf)
 
-
+ # evolving B matrix initial CASE2
  ekf<- read_ANAL_INC("/disk1/asmundb/RESULTS/B_sensTest/CASE4/ekf/ANALYSIS")
 
  CASE4 <- list( ol=ol, ol_ens=ol_ens, ekf=ekf, enkf=enkf)
@@ -464,6 +475,7 @@ SMOS2 <- linReScale(SMOS, nveobs)
 
 
 plot1 <- function(v,pnt=3){
+  col = rainbow(9)
   if (v <=3){
     nveobs <- 0.01*swi2sm(mm2perc(obs$d10[seq(which(obs$time == "2016050106"), which(obs$time == "2016101700"),by=6)]), 6, 48)
   }else if (v == 4){
@@ -475,12 +487,19 @@ plot1 <- function(v,pnt=3){
   }else{
      nveobs <- 0.01*swi2sm(mm2perc(obs$d100[seq(which(obs$time == "2016050106"), which(obs$time == "2016101700"),by=6)]), 6, 48)
   }
-  plot(nveobs,type='l')
-  lines(CASE1$ekf$ana[,v,pnt], col=2)
-  lines(CASE2$ekf$ana[,v,pnt], col=3)
-  lines(CASE4$ekf$ana[,v,pnt], col=4)
-  lines(CASE2$enkf$ana[,v,pnt],col=5)
+  plot(nveobs,type='l', col=col[1 ])
+  lines(CASE1$ekf$ana[,v,pnt], col=col[2])
+  lines(CASE2$ekf$ana[,v,pnt], col=col[3])
+  lines(CASE4$ekf$ana[,v,pnt], col=col[4])
+  lines(CASE2$enkf$ana[,v,pnt],col=col[5])
+  lines(CASE3$enkf$ana[,v,pnt],col=col[6])
+  lines(CASE3$enk$ana[,v,pnt],col=col[7])
+  lines(CASE2$ol$ana[,v,pnt], col=col[8])
+  lines(CASE1$ol_ens$ana[,v,pnt],col=col[9])
   if (v <= 3){
     points(CASE1$ekf$obs[,pnt],pch=20)
   }
+  legend("topleft", legend=c("nve","CASE1 sekf", "CASE2 sekf", "CASE4 ekf", "CASE2 enkf",
+                              "CASE3 enkf", "CASE3 ekf","open loop", "open loop ens"),
+  col=col, lty=1)
 }
