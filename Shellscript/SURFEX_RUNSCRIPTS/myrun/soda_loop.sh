@@ -3,13 +3,13 @@
 #set -x
 #ln -sf /disk1/asmundb/SMOS/OBSERVATIONS/* INPUT/
 
-source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX-V8-0-0-NOMPI-OMP-DEBUG-ASSIM_DIF
+source /home/asmundb/SURFEX2/open_SURFEX_V8_0/conf/profile_surfex-LXgfortran-SFX-V8-0-0-NOMPI-OMP-DEBUG-ASSIM_NILU
 
 ########################################################
 ############ USER INPUT ################################
-start=2016050100
-#end=2016050106
-end=2016101700
+start=2001010206
+end=2001010306
+#end=2016101700
 
 
 # Usage:
@@ -70,7 +70,7 @@ mkdir RESULTS/ANALYSIS
 mkdir RESULTS/ISBA
 
 dtg=$start
-mode=3
+mode=1
 
 cp NAMELISTS/OPTIONS.nam_ENKF_1  NAMELISTS/OPTIONS.nam_ENKF
 while [ $dtg -lt $end ]; do
@@ -78,7 +78,7 @@ while [ $dtg -lt $end ]; do
 
   dtgtmp=$dtg
   dtgtmp=`echo $dtgtmp | cut -c1-4`"-"`echo $dtgtmp | cut -c5-6`"-"`echo $dtgtmp | cut -c7-8`" "`echo $dtgtmp | cut -c9-10`":00"
-  dtg2=`date -u --date "$dtgtmp 6 hours" +%Y%m%d%H`
+  dtg2=`date -u --date "$dtgtmp 24 hours" +%Y%m%d%H`
 
   hh=`echo $dtg | cut -c9-10`
 
@@ -101,6 +101,6 @@ while [ $dtg -lt $end ]; do
   mode=0
   dtgtmp=$dtg
   dtgtmp=`echo $dtgtmp | cut -c1-4`"-"`echo $dtgtmp | cut -c5-6`"-"`echo $dtgtmp | cut -c7-8`" "`echo $dtgtmp | cut -c9-10`":00"
-  dtg=`date -u --date "$dtgtmp 6 hours" +%Y%m%d%H`
+  dtg=`date -u --date "$dtgtmp 24 hours" +%Y%m%d%H`
 done
 

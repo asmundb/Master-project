@@ -503,3 +503,16 @@ plot1 <- function(v,pnt=3){
                               "CASE3 enkf", "CASE3 ekf","open loop", "open loop ens"),
   col=col, lty=1)
 }
+
+
+####
+test <- function(a,b){
+  plot(rm_null(ekf$Ho[,a,pnt]),ekf$ana[,b,pnt],
+       xlab="", ylab="",
+     pch=20)
+  title(main="sekf H vs Soil moisture",
+        xlab="Jacobi",
+      ylab="soil moisture")
+}
+####
+

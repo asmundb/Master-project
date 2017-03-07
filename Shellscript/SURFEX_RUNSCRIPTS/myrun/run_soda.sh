@@ -27,7 +27,7 @@ CSURF_FILETYPE="NC"
 nproc=1
 suffix="nc"
 #npert=5
-fcint=06
+fcint=24
 forc_format="nc"
 analysis=$5
 
@@ -90,7 +90,7 @@ case $mode in
 
     # Copy namelists
 	cat $expdir/NAMELISTS/OPTIONS.nam_$suffix $expdir/NAMELISTS/OPTIONS.nam_pgd$extra_pgd > OPTIONS.nam
-
+#    cp $expdir/NAMELISTS/OPTIONS.nam_SMOSREX OPTIONS.nam
 
     #  Databases (SYSTEM DEPENDENT)
     if [ ! -d $CLIMDATA ]; then
@@ -129,13 +129,14 @@ case $mode in
     cd $work || exit 1
 
     # Copy namelists
-	cat $expdir/NAMELISTS/OPTIONS.nam_$suffix  \
-	    $expdir/NAMELISTS/OPTIONS.nam_prep$extra_prep > OPTIONS.nam.tmp
-    sed -e "s/YYYY0/20$yy/" OPTIONS.nam.tmp  > OPTIONS.nam.tmp2
-    sed -e "s/MM0/$mm/"     OPTIONS.nam.tmp2 > OPTIONS.nam.tmp
-    sed -e "s/DD0/$dd/"     OPTIONS.nam.tmp  > OPTIONS.nam.tmp2
-    sed -e "s/HH0/$hh/"     OPTIONS.nam.tmp2 > OPTIONS.nam
+#cat $expdir/NAMELISTS/OPTIONS.nam_$suffix  \
+#    $expdir/NAMELISTS/OPTIONS.nam_prep$extra_prep > OPTIONS.nam.tmp
+#   sed -e "s/YYYY0/20$yy/" OPTIONS.nam.tmp  > OPTIONS.nam.tmp2
+#   sed -e "s/MM0/$mm/"     OPTIONS.nam.tmp2 > OPTIONS.nam.tmp
+#   sed -e "s/DD0/$dd/"     OPTIONS.nam.tmp  > OPTIONS.nam.tmp2
+#   sed -e "s/HH0/$hh/"     OPTIONS.nam.tmp2 > OPTIONS.nam
 
+    cp $expdir/NAMELISTS/OPTIONS.nam_prep_points OPTIONS.nam
     # Ecoclimap
 	ln -sf $SRC_SURFEX/MY_RUN/ECOCLIMAP/*.bin .
 	ln -sf $SRC_SURFEX/MY_RUN/ECOCLIMAP/*.dat .
@@ -168,9 +169,10 @@ cd $work || exit 1
 ln -sf $expdir/EXE/soda.exe .
 
 # Copy namelist
-cat $expdir/NAMELISTS/OPTIONS.nam_$suffix             \
-    $expdir/NAMELISTS/OPTIONS.nam_io_varassim_ekf     \
-    $expdir/NAMELISTS/OPTIONS.nam_$exp > OPTIONS.nam
+#cat $expdir/NAMELISTS/OPTIONS.nam_$suffix             \
+#   $expdir/NAMELISTS/OPTIONS.nam_io_varassim_ekf     \
+#   $expdir/NAMELISTS/OPTIONS.nam_$exp > OPTIONS.nam
+    cp $expdir/NAMELISTS/OPTIONS.nam_SMOSREX OPTIONS.nam
 
 # Ecoclimap
 ln -sf $SRC_SURFEX/MY_RUN/ECOCLIMAP/*.bin .
@@ -251,7 +253,8 @@ case $exp in
         $expdir/NAMELISTS/OPTIONS.nam_obs             \
         $expdir/NAMELISTS/OPTIONS.nam_io_varassim_ekf \
         $expdir/NAMELISTS/OPTIONS.nam_EKF    > OPTIONS.nam.tmp
-    sed -e "s/LBEV=LBEV/LBEV=.FALSE./" \
+      cp $expdir/NAMELISTS/OPTIONS.nam_SMOSREX OPTIONS.nam.tmp
+  sed -e "s/LBEV=LBEV/LBEV=.FALSE./" \
         -e "s/LPRT=LPRT/LPRT=.FALSE./" \
         -e "s/LSIM=LSIM/LSIM=.FALSE./" \
         -e "s/NIVAR=NIVAR/NIVAR=1/" \

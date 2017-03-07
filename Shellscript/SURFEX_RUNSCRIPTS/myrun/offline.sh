@@ -104,8 +104,8 @@ ln -sf $SRC_SURFEX/MY_RUN/ECOCLIMAP/*.dat .
 # Copy Forcing
 
 echo "copy FORCING_$dtg"
-if [ -f $expdir/FORCING/FORCING.nc_$dtg* ]; then
-  cp $expdir/FORCING/FORCING.nc_$dtg* FORCING.nc
+if [ -f $expdir/FORCING/$dtg* ]; then
+  cp $expdir/FORCING/$dtg* FORCING.nc
 else
   echo "No forcing found: $expdir/FORCING/FORCING.nc_$dtg"
   exit 1
