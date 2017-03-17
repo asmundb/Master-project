@@ -2,7 +2,7 @@
 
 # extract ncfiles from tgz files
 
-work="/disk1/asmundb/SMOS"
+work="/lustre/storeB/users/asmundb/SMOS/"
 cd $work
 files=( `ls -d -1 eftp.ifremer.fr/SM/GRIDDED/L3SM/OPER/**/**/**/*` )
 
@@ -23,5 +23,6 @@ do
   fi
 done
 
+mv *.nc nc
 
 #SM_OPER_MIR_CLF31A_20161016T000000_20161016T235959_300_001_7.DBL.nc  SM_OPER_MIR_CLF31A_20161016T000000_20161016T235959_300_001_7.tgz

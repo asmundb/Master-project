@@ -63,3 +63,4 @@ plotMap <- function(lon2d, lat2d, var, ...){
   ggplot() + zsmap + worldmap + projection + colors
 }
 
+
