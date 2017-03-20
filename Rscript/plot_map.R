@@ -57,10 +57,12 @@ lat_range = which(map_axis[3] < lat & map_axis[4] > lat)
 par(new=T)
 image(x=lon[lon_range],
       y=lat[lat_range],
-	  z=x[lon_range, lat_range],
+      z=x[lon_range, lat_range],
       xlim=c(min(lon[lon_range]),max(lon[lon_range])),
       ylim=c(min(lat[lat_range]),max(lat[lat_range])),
-	  col=rev(gray.colors(10)))
+      col=rev(gray.colors(10)),
+      xlab="lontitude",
+      ylab="latitude")
 #dev.off()
 stas <- read_stlist("stationlist.cfg")
 

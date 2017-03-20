@@ -9,6 +9,7 @@ source("functions.R")
 # path to SMOS nc files
 # see Shellscripts/SMOS_extract.sh
 path    <- "/disk1/asmundb/SMOS/nc/"
+path <- "/lustre/storeB/users/asmundb/SMOS/nc/"
 
 # path to save OBSERVATIONS_XXXXXXXX.DAT files (input in soda)
 #outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/2016/"
