@@ -4,7 +4,7 @@
 
 work="/lustre/storeB/users/asmundb/SMOS/"
 cd $work
-files=( `ls -d -1 eftp.ifremer.fr/SM/GRIDDED/L3SM/RE04/**/**/**/*` )
+files=( `ls -d -1 eftp.ifremer.fr/SM/GRIDDED/L3SM/OPER/**/**/**/*` )
 
 if [ ! -d ./nc ]; then
   mkdir nc
