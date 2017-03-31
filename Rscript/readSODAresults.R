@@ -23,6 +23,7 @@ nc_close(ncid)
 ### PGD.nc ###
 # 
 #  contains frac_nature (points which is assimilated
+#59.950516, 10.803464
 #
 
 filename <- "surfex_files/PGD_2D.nc"
@@ -47,7 +48,10 @@ ncid <- nc_open(filename)
 lon_arome <- ncvar_get(ncid, ncid$var$longitude)
 lat_arome <- ncvar_get(ncid, ncid$var$latitude)
 wg1_arome <- ncvar_get(ncid, ncid$var$WG1)
+wgi1_arome <- ncvar_get(ncid, ncid$var$WGI1)
 nc_close(ncid)
+
+
 
 lonlat0 <- arrayInd(which.min( (lat_arome - min(lat))^2 + (lon_arome - min(lon))^2 ), dim(lat_arome))
 lons <- seq(lonlat0[1], by=1, length.out=111)
@@ -64,8 +68,15 @@ for ( k in 1:length(lon)){
   ij[k]   <- x$ij_out
   dist[k] <- x$dist[x$ij_out]
 }
-wg1_arome_mygrid2 <- matrix(array(wg1_arome), nx, ny)
+wg1_arome_mygrid2 <- array(dim=c(111,111,dim(wg1_arome)[3]))
+for (i in 1:dim(wg1_arome)[3]){
+  wg1_arome_mygrid2[,,i] <- matrix(array(wg1_arome[,,i])[ij], nx, ny)
+}
 
+wgi1_arome_mygrid2 <- array(dim=c(111,111,dim(wgi1_arome)[3]))
+for (i in 1:dim(wgi1_arome)[3]){
+  wgi1_arome_mygrid2[,,i] <- matrix(array(wgi1_arome[,,i])[ij], nx, ny)
+}
 
 
 
@@ -140,12 +151,12 @@ maskNreshape <- function(x, fn){
 ### Visualisation ###
 
 
-movieMap <- function(var,by=1){
+movieMap <- function(var,by=1,fps=2){
 # plot as movie
 #
   for (i in seq(1,dim(var)[3], by=by)){
     image.plot(var[,,i], main=i, zlim=c(min(var,na.rm=T),max(var, na.rm=T)))
-    Sys.sleep(1)
+    Sys.sleep(1/fps)
   }
 }
 
@@ -164,6 +175,8 @@ plotMap <- function(lon2d, lat2d, var, ...){
     ylim <- c(min(lat2d),max(lat2d))
   }else{
     ylim <- list(...)[["ylim"]]
+#59.950516, 10.803464
+#59.950516, 10.803464
   }
 
   # Get the map outlines
@@ -266,6 +279,25 @@ time <- seq(as.POSIXlt("2016-10-07 06:00"),length=16, by=3600*12)
  makePDF(sekf$xf[,,seq(1,31,by=2),6]-ol[,,seq(1,31,by=2),6],time)
  makePDF(sekf$xf[,,seq(1,31,by=2),5]-ol[,,seq(1,31,by=2),5],time)
  makePDF(sekf$xf[,,seq(1,31,by=2),7]-ol[,,seq(1,31,by=2),7],time)
+ 
+ makeODF(wg1_arome_mygrid2[,,c(6,18)], arome_time[c(6,18)])
+
+
+ pdf("wg1_arome_101006.pdf")
+ image.plot(wg1_arome_mygrid2[,,6]+wgi1_arome_mygrid2[,,6], zlim=c(0.1,0.43), main="wg1+wgi1 AROME-MetCoOp 2016-10-10 06:00")
+ contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
+ dev.off()
+
+ pdf("wg1_101006.pdf")
+ image.plot(sm_tot_ol[,,78], zlim=c(.1,0.43), main="wg1+wgi1 SURFEX offline openloop 2016-10-10 06:00")
+ contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
+ dev.off()
+
+
+ pdf("wg1_sekf_101006.pdf")
+ image.plot(sm_tot_sekf[,,78], zlim=c(.1,0.43), main="wg1+wgi1 SURFEX offline sekf 2016-10-10 06:00")
+ contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
+ dev.off()
 
 
 
