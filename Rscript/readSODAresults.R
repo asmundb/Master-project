@@ -151,13 +151,35 @@ maskNreshape <- function(x, fn){
 ### Visualisation ###
 
 
-movieMap <- function(var,by=1,fps=2){
+movieMap <- function(var,by=1,fps=10, save=F, title=""){
 # plot as movie
-#
-  for (i in seq(1,dim(var)[3], by=by)){
-    image.plot(var[,,i], main=i, zlim=c(min(var,na.rm=T),max(var, na.rm=T)))
-    Sys.sleep(1/fps)
+# 
+  d3 <-  dim(var)[3]
+  if (length(title) != d3 ){
+    title <- paste("frame", 1:d3)
   }
+
+  if (save) {
+    system("mkdir tmp")
+    k <- seq(1,d3, by=by)
+    for (i in 1:length(k)){
+      png(sprintf("tmp/tmp_%06d.png",i))
+      image.plot(var[,,k[i]], 
+                 main=title[k[i]],
+                 zlim=c(min(var,na.rm=T),max(var, na.rm=T)),
+                 col=rev(tim.colors()))
+      dev.off()
+    }
+    system(sprintf("avconv -r %d -start_number 0 -i tmp/tmp_\\%06d.png -b:v 1000k out.mp4", fps))
+    system("rm -r tmp")
+  } else {  
+    for (i in seq(1,dim(var)[3], by=by)){
+      image.plot(var[,,i], main=i, zlim=c(min(var,na.rm=T),max(var, na.rm=T)),
+                 col=rev(tim.colors()))
+      Sys.sleep(1/fps)
+    }
+  }
+
 }
 
 plotMap <- function(lon2d, lat2d, var, ...){
