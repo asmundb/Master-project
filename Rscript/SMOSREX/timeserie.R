@@ -37,7 +37,7 @@ wsat  <- (-1.08*sand + 494.305)*10^(-3)
 wfc   <- 89.0467*10^(-3)*clay^(0.3496)
 
 ncid <- nc_open("/lustre/storeB/users/asmundb/surfex/SMOSREX/RUN/RUN_OFFLINE/SURFOUT.nc")
-
+# LRESTART_2M = T # for WWILT etc. in prep.nc
 wwiltp <- ncvar_get(ncid, ncid$var$WWILT1)
 wsatp  <- ncvar_get(ncid, ncid$var$WSAT1)
 wfcp   <- ncvar_get(ncid, ncid$var$WFC1)

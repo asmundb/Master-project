@@ -39,6 +39,7 @@ nc_close(ncid)
 filename <- "surfex_files/PREP_SODA.nc"
 ncid <- nc_open(filename)
 wwilt1 <- ncvar_get(ncid, ncid$var$WWILT1)
+wsat1 <- ncvar_get(ncid, ncid$var$WSAT1)
 wfc1   <- ncvar_get(ncid, ncid$var$WFC1)
 nc_close(ncid)
 ################################################################
@@ -172,6 +173,7 @@ sm_spinup <- spinup_wg1 + spinup_wgi1
 path <- "/lustre/storeB/users/asmundb/surfex/myrun_domain/RESULTS/ISBA/"
 spin <- loadISBA(path, "ISBA_PROGNOSTIC","WG2")
 
+spin2 <- loadISBA(path, "ISBA_PROGNOSTIC", "WGI2")
 
 
 

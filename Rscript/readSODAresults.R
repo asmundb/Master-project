@@ -12,7 +12,7 @@ library(fields)
 #
 #  contains lon, lat, and zs (topography)
 #
-
+print("read coordinates from forcing file...")
 filename <- "surfex_files/FORCING.nc"
 ncid <- nc_open(filename)
 lon  <- ncvar_get(ncid, ncid$var$LON)
@@ -26,6 +26,7 @@ nc_close(ncid)
 #59.950516, 10.803464
 #
 
+print("read dimensions from pgd file...")
 filename <- "surfex_files/PGD_2D.nc"
 ncid <- nc_open(filename)
 frac_nature <- ncvar_get(ncid, ncid$var$FRAC_NATURE)
@@ -35,6 +36,7 @@ nc_close(ncid)
 
 ### PREP.nc ###
 
+print("read soil parameters from prep file...")
 filename <- "surfex_files/PREP_SODA.nc"
 ncid <- nc_open(filename)
 wwilt1 <- ncvar_get(ncid, ncid$var$WWILT1)
@@ -43,6 +45,7 @@ nc_close(ncid)
 
 ### AROME-METCOOP ###
 
+print("read coordinates from arome file...")
 filename <- "surfex_files/AROME_MetCoOp_00_sfx.nc_20161010"
 ncid <- nc_open(filename)
 lon_arome <- ncvar_get(ncid, ncid$var$longitude)
@@ -53,11 +56,12 @@ nc_close(ncid)
 
 
 
-lonlat0 <- arrayInd(which.min( (lat_arome - min(lat))^2 + (lon_arome - min(lon))^2 ), dim(lat_arome))
-lons <- seq(lonlat0[1], by=1, length.out=111)
-lats <- seq(lonlat0[2], by=1, length.out=111)
-wg1_arome_mygrid <- wg1_arome[lons,lats,]
+#lonlat0 <- arrayInd(which.min( (lat_arome - min(lat))^2 + (lon_arome - min(lon))^2 ), dim(lat_arome))
+#lons <- seq(lonlat0[1], by=1, length.out=111)
+#lats <- seq(lonlat0[2], by=1, length.out=111)
+#wg1_arome_mygrid <- wg1_arome[lons,lats,]
 #rm(wg1_arome)
+
 
 source("ffunctions.R")
 ij <- numeric(length(lon))
@@ -110,12 +114,17 @@ loadSMOS <- function(path, nx=111, ny=111){
                       full.name=T)
   nfiles <- length(files)
   var <- array(dim=c(nx,ny,nfiles))
+  time <- array(dim=nfiles)
   for (i in 1:nfiles){
     tmp <- as.matrix(read.table(files[i]))
     var[,,i] <- matrix(tmp,nx,ny)
+    tstr     <- regmatches(files[i], regexec("OBSERVATIONS_(\\d+H\\d+).DAT", files[i]))[[1]][2]
+    time[i]  <- paste("20", gsub("H","",tstr),sep="")
   }
   var[which(var >= 999)] <- NA
-  return(var)
+  out <- list( time=time, var=var )
+
+  return(out)
 }
 
 ### Reshaping ###
@@ -170,7 +179,7 @@ movieMap <- function(var,by=1,fps=10, save=F, title=""){
                  col=rev(tim.colors()))
       dev.off()
     }
-    system(sprintf("avconv -r %d -start_number 0 -i tmp/tmp_\\%06d.png -b:v 1000k out.mp4", fps))
+    system(sprintf("avconv -r %d -start_number 0 -i tmp/tmp_%%06d.png -b:v 1000k out.mp4", fps))
     system("rm -r tmp")
   } else {  
     for (i in seq(1,dim(var)[3], by=by)){
@@ -222,28 +231,29 @@ plotMap <- function(lon2d, lat2d, var, ...){
   ggplot() + zsmap + worldmap + projection #+ colors
 }
 
-makePDF <- function(var,time){
+makePDF <- function(var,time,outPath){
   for (i in 1:dim(var)[3]){
     varname <- deparse(substitute(var))
 #    print(varname)
     varname <- gsub("[^[:alnum:]]","",varname)
 #    print(varname)
-    filename <- sprintf("figures/20170323/%s_%02d.pdf", varname, i)
+    filename <- sprintf("%s/%s_%02d.pdf",outPath, varname, i)
 #    print(filename)
     pdf(filename)
-    image.plot(var[,,i], zlim=c(min(var,na.rm=T), max(var,na.rm=T)), main=time[i])
+    image.plot(var[,,i], zlim=c(min(var,na.rm=T), max(var,na.rm=T)), main=time[i], col=rev(tim.colors()))
     contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
     dev.off()
   }
-  system(sprintf("pdfunite figures/20170323/%s_* figures/20170323/%s.pdf", varname,varname))
-  system(sprintf("rm figures/20170323/%s_*", varname))
+  system(sprintf("pdfunite %s/%s_* %s/%s.pdf",outPath, varname, outPath,varname))
+  system(sprintf("rm %s/%s_*", outPath, varname))
 }
 
 
 ###########################################################
 
 ### Load data ###
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/SEKF/ANALYSIS/"
+print("read soda output...")
+path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/SEKF_sat-wilt/ANALYSIS/"
 
 ana    <- load001(path, "ANAL_INCR")
 xf     <- ana[,,,1:7]
@@ -260,10 +270,12 @@ sekf <- list( xf=xf,
 
 
 
+print("read SMOS files...")
+SMOS1   <- loadSMOS("/lustre/storeB/users/asmundb/SMOS/OBSERVATIONS")
+SMres1  <- loadSMOS("/lustre/storeB/users/asmundb/SMOS/OBSERVATIONS_sat-wilt")
 
-SMOS   <- loadSMOS("/lustre/storeB/users/asmundb/SMOS/OBSERVATIONS")[,,3:18]
-SMres  <- loadSMOS("/lustre/storeB/users/asmundb/SMOS/OBSERVATIONS_rescaled")[,,3:18]
-
+SMOS <- SMOS1$var[,,which(as.numeric(SMOS1$time) >= 2016100606)]
+SMres <- SMres1$var[,,which(as.numeric(SMres1$time) >= 2016100606)]
 
   
 
@@ -276,7 +288,7 @@ image.plot(frac_nature, col=two.colors(n=256,start="blue", end="darkgreen", midd
 contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
 
 # time 
-time <- seq(as.POSIXlt("2016-10-07 06:00"),length=16, by=3600*12)
+time <- seq(as.POSIXlt("2016-10-06 06:00"),length=22, by=3600*12)
 
 #time <- 1
 #slr  <- 6
@@ -292,17 +304,20 @@ time <- seq(as.POSIXlt("2016-10-07 06:00"),length=16, by=3600*12)
 # obsout
 #image.plot(obsout[,,time,1])
 
- makePDF(SMOS,time)
- makePDF(sekf$obsout[,,seq(1,31,by=2),1],time)
- makePDF(sekf$inc[,,seq(1,31,by=2),6],time)
- makePDF(sekf$xf[,,seq(1,31,by=2),6],time)
- makePDF(sekf$innov[,,seq(1,31,by=2),1],time)
- makePDF(SMres,time)
- makePDF(sekf$xf[,,seq(1,31,by=2),6]-ol[,,seq(1,31,by=2),6],time)
- makePDF(sekf$xf[,,seq(1,31,by=2),5]-ol[,,seq(1,31,by=2),5],time)
- makePDF(sekf$xf[,,seq(1,31,by=2),7]-ol[,,seq(1,31,by=2),7],time)
+outPath <- "figures/20170406"
+
+ makePDF(SMOS,time,outPath)
+ makePDF(sekf$obsout[,,seq(1,31,by=2),1],time,outPath)
+ makePDF(sekf$inc[,,seq(1,31,by=2),6],time,outPath)
+ makePDF(sekf$xf[,,seq(1,31,by=2),6],time,outPath)
+ makePDF(sekf$innov[,,seq(1,31,by=2),1],time,outPath)
+ makePDF(SMres,time,outPath)
+
+ makePDF(sekf$xf[,,seq(1,31,by=2),6]-ol[,,seq(1,31,by=2),6],time,outPath)
+ makePDF(sekf$xf[,,seq(1,31,by=2),5]-ol[,,seq(1,31,by=2),5],time,outPath)
+ makePDF(sekf$xf[,,seq(1,31,by=2),7]-ol[,,seq(1,31,by=2),7],time,outPath)
  
- makeODF(wg1_arome_mygrid2[,,c(6,18)], arome_time[c(6,18)])
+ makePDF(wg1_arome_mygrid2[,,c(6,18)], arome_time[c(6,18)],outPath)
 
 
  pdf("wg1_arome_101006.pdf")
@@ -320,6 +335,26 @@ time <- seq(as.POSIXlt("2016-10-07 06:00"),length=16, by=3600*12)
  image.plot(sm_tot_sekf[,,78], zlim=c(.1,0.43), main="wg1+wgi1 SURFEX offline sekf 2016-10-10 06:00")
  contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
  dev.off()
+
+
+
+smos_mean <- apply(SMOS, c(1,2), mean, na.rm=T)
+
+smres_mean <- apply(SMres, c(1,2), mean, na.rm=T)
+
+pdf("SMOS_average.pdf")
+image.plot(smos_mean, main="Average SMOS retrieval", col=rev(tim.colors()))
+dev.off()
+
+pdf("SMred_average.pdf")
+image.plot(smres_mean, main="Average normalized SMOS retrieval", col=rev(tim.colors()))
+dev.off()
+
+
+
+
+
+
 
 
 
