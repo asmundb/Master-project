@@ -6,8 +6,8 @@
 dyn.load("FLIB/nn_lon_lat.so")
 fnn <- function(lon,lat,lon0,lat0){
   ij_out <- .Fortran("nn_lon_lat",
-                     lon0=as.numeric(I[k]),
-                     lat0=as.numeric(J[k]),
+                     lon0=as.numeric(lon0),
+                     lat0=as.numeric(lat0),
                      lon=as.numeric(lon),
                      lat=as.numeric(lat),
                      nlon=as.integer(length(lon)),
