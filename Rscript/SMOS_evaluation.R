@@ -76,7 +76,8 @@ zlim <- c(min(min(sm_mean,na.rm=T), min(sm_norm_mean,na.rm=T), min(wg1_ol_mean,n
 wet_colo <- rev(tim.colors())
 dif_colo <- designer.colors( n=256, col= c("red", "white", "blue"), x=seq(-1,1,length=3) ,alpha=1.0)
 
-### CORRELATION ###
+
+
 
 #times to compare
 ttc <- seq(as.POSIXlt("2016-05-01 06:00"), as.POSIXlt("2016-10-16 18:00"), by=3600*12)
@@ -86,15 +87,39 @@ ttc <- format(ttc,format="%Y-%m-%d %H:%M")
 smos_tc <- smos$sm[,,which(smos$time %in% ttc)]
 offline_tc <- wg1_ol[,,seq(6,by=12,length=length(ttc))]
 
+
+### CORRELATION ###
 smos_cor <- array(dim=c(111,111))
 for (i in 1:111){
   for (j in 1:111){
     smos_cor[j,i] <- cor(smos_tc[j,i,], offline_tc[j,i,], use='na')
   }
 }
+pdf("figures/SMOS_evaluation/smos-offline_cor.pdf")
+image.plot(smos_cor, col=calla(smos_cor), main="SMOS OFFLINE correlation")
+topo()
+dev.off()
 
 
-stop()
+### DIFFERENCE ###
+smosMoff <- smos_tc - offline_tc
+smosMoff_mean <- apply(smosMoff,c(1,2), mean, na.rm=T)
+
+#pdf("figures/SMOS_evaluation/smos-offline_mean.pdf")
+#image.plot(smosMoff_mean, col=calla(smosMoff_mean), main="")
+#topo()
+#dev.off()
+
+
+### RMSE ###
+
+N <- dim(smos_tc)[3]
+rmse <- sqrt(apply(smosMoff^2, c(1,2), sum,na.rm=T)/N)
+
+pdf("figures/SMOS_evaluation/smos-offline_rmse.pdf")
+image.plot(rmse,col=c("white",two.colors(start="white",end="black",middle="red")), main="SMOS OFFLINE RMSE")
+topo()
+dev.off()
 
 #
 #pdf("sm_mean.pdf")
@@ -108,40 +133,40 @@ stop()
 #
 ## scaled to model range
 #
-pdf("smos_mean_norm.pdf")
-image.plot(sm_norm_mean,
-           col=colo,
-           main="Averaged normalized Soil Moisture Retrieval",
-           zlim=zlim)
-topo()
-dev.off()
-#
-## open loop
-#
-#pdf("sm_mean_openloop.pdf")
-#image.plot(wg1_ol_mean,
+#pdf("smos_mean_norm.pdf")
+#image.plot(sm_norm_mean,
 #           col=colo,
-#           main="Averaged Soil Moisture modeled",
+#           main="Averaged normalized Soil Moisture Retrieval",
 #           zlim=zlim)
 #topo()
 #dev.off()
-#
-#
-## diff
-#
-pdf("sm_mean_smos-model.pdf")
-image.plot(sm_mean-wg1_ol_mean,
-           col=calla(sm_mean-wg1_ol_mean),
-           main="Difference Averaged Soil Moisture SMOS-modeled")
-topo()
-dev.off()
-#
-pdf("sm_mean_smos_norm-model.pdf")
-image.plot(smos_norm_mean_true-wg1_ol_mean,
-           col=calla(smos_norm_mean_true-wg1_ol_mean),
-           main="Difference Averaged Soil Moisture SMOS_norm-modeled")
-topo()
-dev.off()
+##
+### open loop
+##
+##pdf("sm_mean_openloop.pdf")
+##image.plot(wg1_ol_mean,
+##           col=colo,
+##           main="Averaged Soil Moisture modeled",
+##           zlim=zlim)
+##topo()
+##dev.off()
+##
+##
+### diff
+##
+#pdf("sm_mean_smos-model.pdf")
+#image.plot(sm_mean-wg1_ol_mean,
+#           col=calla(sm_mean-wg1_ol_mean),
+#           main="Difference Averaged Soil Moisture SMOS-modeled")
+#topo()
+#dev.off()
+##
+#pdf("sm_mean_smos_norm-model.pdf")
+#image.plot(smos_norm_mean_true-wg1_ol_mean,
+#           col=calla(smos_norm_mean_true-wg1_ol_mean),
+#           main="Difference Averaged Soil Moisture SMOS_norm-modeled")
+#topo()
+#dev.off()
 
 
 ### Soil Moisture Data Quality indeX ###
