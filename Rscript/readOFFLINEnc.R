@@ -1,9 +1,9 @@
-library(ggplot2)
-library(ggmap)
+#library(ggplot2)
+#library(ggmap)
 library(maps)
 library(mapdata)
-library(maptools)
-gpclibPermit()
+#library(maptools)
+#gpclibPermit()
 library(mapproj)
 library(ncdf4)
 library(fields)
@@ -86,7 +86,8 @@ sm_arome <- wgi1_arome_mygrid2 + wg1_arome_mygrid2
 ### SURFEX-OFFLINE ###
 
 ## NO SPINUP
-path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/openloop/ISBA/"
+#path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/openloop/ISBA/"
+path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/OPEN_LOOP_SPINUP/ISBA/"
 
 loadISBA <- function(path, filename, varname){
   require(ncdf4)
@@ -111,15 +112,16 @@ loadISBA <- function(path, filename, varname){
 
 
 ## NO SPINUP
-path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/openloop/ISBA/2016100700/"
-
-nospinup_wg1 <- loadISBA(path,"ISBA_PROGNOSTIC", "WG1")
-nospinup_wgi1 <- loadISBA(path,"ISBA_PROGNOSTIC", "WGI1")
-
-sm_nospinup <- nospinup_wg1 + nospinup_wgi1
+#path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/openloop/ISBA/2016100700/"
+#
+#nospinup_wg1 <- loadISBA(path,"ISBA_PROGNOSTIC", "WG1")
+#nospinup_wgi1 <- loadISBA(path,"ISBA_PROGNOSTIC", "WGI1")
+#
+#sm_nospinup <- nospinup_wg1 + nospinup_wgi1
 
 ## SPINUP SINCE MAY
-path <- "/lustre/storeB/users/asmundb/surfex/myrun_domain/RESULTS/ISBA/2016100700/"
+#path <- "/lustre/storeB/users/asmundb/surfex/myrun_domain/RESULTS/ISBA/2016100700/"
+path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/OPEN_LOOP_SPINUP/ISBA/"
 
 spinup_wg1 <- loadISBA(path=path,
                    filename="ISBA_PROGNOSTIC",
@@ -136,45 +138,46 @@ sm_spinup <- spinup_wg1 + spinup_wgi1
 ### plots ###
 # static
 #image.plot(frac_nature, col=two.colors(n=256,start="blue", end="darkgreen", middle="orange"))
-#contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
+contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
 
 # time 
-#time <- seq(as.POSIXlt("2016-10-07 06:00"),length=16, by=3600*12)
-#
-#zlim <- c(min(sm_nospinup[,,1], sm_spinup[,,1], sm_arome[,,2],na.rm=T),
-#          max(sm_nospinup[,,1], sm_spinup[,,1], sm_arome[,,2],na.rm=T))
-#
-#colo <- rev(tim.colors())
-#
+time <- seq(as.POSIXlt("2016-10-07 06:00"),length=16, by=3600*12)
+
+zlim <- c(min(sm_spinup[,,1], sm_arome[,,2],na.rm=T),
+          max(sm_spinup[,,1], sm_arome[,,2],na.rm=T))
+
+colo <- rev(tim.colors())
+
 #pdf("figures/spinup_domain/sm_nospintup.pdf")
 #image.plot(sm_nospinup[,,1],
 #           zlim=zlim,
 #           col=colo,
 #           main="OFFLINE ISBA-DIF, no spinup, wgi1+wg1, 07/10 01:00" )
 #dev.off()
-#
-#pdf("figures/spinup_domain/sm_spinup.pdf")
-#image.plot(sm_spinup[,,1], 
-#           zlim=zlim, 
-#           col=colo  , 
-#           main="OFFLINE ISBA-DIF, 5-month spinup, wgi1+wg1, 07/10 01:00")
-#dev.off()
-#
-#pdf("figures/spinup_domain/sm_arome_oper.pdf")
-#image.plot(sm_arome[,,1], 
-#           zlim=zlim, 
-#           col=colo, 
-#           main="AROME-METCOOP (force-restore), oper, wgi1+wg1, 07/10 01:00" )
-#dev.off()
-#
+
+pdf("figures/spinup_domain/sm_spinup.pdf")
+image.plot(sm_spinup[,,1], 
+           zlim=zlim, 
+           col=colo  , 
+           main="OFFLINE ISBA-DIF, 5-month spinup, wgi1+wg1, 07/10 01:00")
+contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
+dev.off()
+
+pdf("figures/spinup_domain/sm_arome_oper.pdf")
+image.plot(sm_arome[,,1], 
+           zlim=zlim, 
+           col=colo, 
+           main="AROME-METCOOP (force-restore), oper, wgi1+wg1, 07/10 01:00" )
+contour(matrix(zs, 111,111), add=T, levels=c(0,2,10,50,100,200,500,1000))
+dev.off()
+
 ################################################################################
 
 
-path <- "/lustre/storeB/users/asmundb/surfex/myrun_domain/RESULTS/ISBA/"
-spin <- loadISBA(path, "ISBA_PROGNOSTIC","WG2")
+#path <- "/lustre/storeB/users/asmundb/surfex/myrun_domain/RESULTS/ISBA/"
+#spin <- loadISBA(path, "ISBA_PROGNOSTIC","WG2")
 
-spin2 <- loadISBA(path, "ISBA_PROGNOSTIC", "WGI2")
-
+#spin2 <- loadISBA(path, "ISBA_PROGNOSTIC", "WGI2")
 
 
 

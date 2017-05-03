@@ -2,7 +2,7 @@ require(ncdf4)
 require(fields)
 
 path <- "/lustre/storeB/users/asmundb/surfex/SMOSREX/RESULT/"
-
+#### ISBA_PROGNOSTIC ####
 files <- list.files(path=path,
                     pattern="ISBA_PROGNOSTIC",
                     recursive=T,
@@ -29,6 +29,27 @@ for (i in 1:nfiles){
 }
 sm <- wg + wgi
 
+
+#### ISBA_DIAGNOSTICS ####
+files <- list.files(path=path,
+                    pattern="ISBA_DIAGNOSTICS",
+                    recursive=T,
+                    full.names=T)
+
+nfiles <- length(files)
+
+varnames <- "LAI_ISBA"
+nr <- nfiles*8
+lai <- array(dim=c(nr))
+
+k <- 1
+for (i in 1:nfiles){
+  ncid <- nc_open(files[i])
+  lai[k:(k+7)] <- ncvar_get(ncid, ncid$var[[varnames]])#{[10,]
+  nc_close(ncid)
+  k <- k+8
+}
+
 # soil parameters
 clay <- 0.317
 sand <- 0.231
@@ -46,7 +67,7 @@ nc_close(ncid)
 
 
 times <- seq(as.POSIXlt("2001-01-01 07:00"), as.POSIXlt("2007-01-01 06:00"), by=3600*3)
-at <- seq(1, nr, by=8*14)
+at <- seq(0, nr, by=8*500)
 
 ### PLOT ###
 
@@ -56,12 +77,12 @@ plot_timeserie <- function(layers){
   plot(1:nr, 
        ylim=c(wwiltp-0.01,0.5), #c(min(wg,na.rm=T), max(wg,na.rm=T)),
        main="SMOSREX total soil moisture (wg+wgi)",
-       xlab="",
-       ylab="",
+       xlab="days since 2001-01-01",
+       ylab="total soil moisture",
        xaxt="n",
        type='n')
  
-  axis(1,at=at, labels=format(times[at],format="%b-%y"))
+  axis(1,at=at, labels=c(seq(0,by=500,length=length(at)))) #labels=format(times[at],format="%b-%y"))
 
   colo <- tim.colors(8)
 
@@ -76,3 +97,25 @@ plot_timeserie <- function(layers){
   legend("topright", inset=c(-0.24,0), wsatp,       legend=varnames[layers],         lty=1,         col=colo[layers])
   legend("bottomright", inset=c(-0.24,0),   legend=c("wsat","wfc","wwilt"),    lty=c(3,4,2))
 }
+
+
+
+#### layer by layer ####
+
+for (i in 1:8){
+  outfile <- sprintf("totalSoilMoisture_l%d.pdf", i)
+  pdf(outfile)
+  plot_timeserie(i)
+  dev.off()
+}
+
+
+pdf("lai.pdf")
+plot(lai,type='l',
+         xaxt="n", 
+         xlab="days since 2001-01-01",
+         ylab="Leaf Area Index", 
+         main="SMOSREX Leaf Area Index")
+axis(1,at=at, labels=c(seq(0,by=500,length=length(at))))
+dev.off()
+

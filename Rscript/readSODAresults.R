@@ -1,5 +1,5 @@
-library(ggplot2)
-library(ggmap)
+#library(ggplot2)
+#library(ggmap)
 library(maps)
 library(mapdata)
 library(maptools)
@@ -179,8 +179,8 @@ movieMap <- function(var,by=1,fps=10, save=F, title=""){
                  col=rev(tim.colors()))
       dev.off()
     }
-    system(sprintf("avconv -r %d -start_number 0 -i tmp/tmp_%%06d.png -b:v 1000k out.mp4", fps))
-    system("rm -r tmp")
+    system(sprintf("avconv -r %d -start_number 1 -i tmp/tmp_%%06d.png -b:v 1000k out.mp4", fps))
+#    system("rm -r tmp")
   } else {  
     for (i in seq(1,dim(var)[3], by=by)){
       image.plot(var[,,i], main=i, zlim=c(min(var,na.rm=T),max(var, na.rm=T)),
