@@ -4,56 +4,61 @@ read_ANAL_INC <- function(res_path){
   dirs <- list.dirs(res_path,recursive=F)
   ndir <- length(dirs)
 
-  analysis  <- array(dim=c(ndir,7,8)) 
-  increment <- array(dim=c(ndir,7,8))
-  obs       <- array(dim=c(ndir,8))
-  obserr    <- array(dim=c(ndir,8))
-  innov     <- array(dim=c(ndir,8))
-  Ho        <- array(dim=c(ndir,7,8))
-  Kg        <- array(dim=c(ndir,7,8))
+  npoints <- 1
+  nvar    <- 3
+  nobs    <- 1
+  patch   <- 10
+
+
+  analysis  <- array(dim=c(ndir,nvar)) 
+  increment <- array(dim=c(ndir,nvar))
+  obs       <- array(dim=c(ndir))
+  obserr    <- array(dim=c(ndir))
+  innov     <- array(dim=c(ndir))
+  Ho        <- array(dim=c(ndir,nvar))
+  Kg        <- array(dim=c(ndir,nvar))
   time <- array(dim=ndir)
   for (idir in 1:ndir){
     dtg <- substring(dirs[idir], nchar(dirs[idir])-9,nchar(dirs[idir]))
     tmp1 <- read.table(paste(dirs[idir],"/ANAL_INCR.0000001",sep=""))
-	tmp2 <- read.table(paste(dirs[idir],"/OBSout.0000001",sep=""))
-	tmp3 <- read.table(paste(dirs[idir],"/OBSERRORout.0000001",sep=""))
-	tmp4 <- read.table(paste(dirs[idir],"/INNOV.0000001",sep=""))
-	innov[idir,] <- as.matrix(tmp4)
-	obserr[idir,] <- as.matrix(tmp3)
-	obs[idir,] <- as.matrix(tmp2)
-	time[idir] <- as.numeric(dtg)
-    for (v in 1:7){
-      analysis[idir,8-v,] <- tmp1[,v]
-      increment[idir,8-v,]<- tmp1[,v+7]
+    tmp2 <- read.table(paste(dirs[idir],"/OBSout.0000001",sep=""))
+    tmp3 <- read.table(paste(dirs[idir],"/OBSERRORout.0000001",sep=""))
+    tmp4 <- read.table(paste(dirs[idir],"/INNOV.0000001",sep=""))
+    innov[idir] <- as.matrix(tmp4)
+    obserr[idir] <- as.matrix(tmp3)
+    obs[idir] <- as.matrix(tmp2)
+    time[idir] <- as.numeric(dtg)
+    for (v in 1:nvar){
+      analysis[idir,v] <- tmp1[patch,v]
+      increment[idir,v]<- tmp1[patch,v+nvar]
       tmp5 <- read.table(paste(dirs[idir],"/HO_WG",v,"_v1",sep=""))
-	  Ho[idir,v,] <- tmp5[,1]
-      Kg[idir,v,] <- tmp5[,2]
+      Ho[idir,v] <- tmp5[patch,1]
+      Kg[idir,v] <- tmp5[patch,2]
     }
   }
+  forecast <- analysis - increment
   obs[which(obs > 900)] <- NA
   anaNinc <- list(time=time,
+                  fcst=forecast,
                   ana=analysis,
                   inc=increment,
-				  obs=obs,
-				  obserr=obserr,
-				  innov=innov,
-				  Ho=Ho,
-				  Kg=Kg)
+                  obs=obs,
+                  obserr=obserr,
+                  innov=innov,
+                  Ho=Ho,
+                  Kg=Kg)
   return(anaNinc)
 }
 
 read_SURFEX_RESULT <- function(res_path){
-
   dirs <- list.dirs(res_path,recursive=F)
   ndir <- length(dirs)
-
   # Could be read from file "SURFEX_RESULTS"
   npoints <- 1
   nvar    <- 3
   nens    <- 5
   nobs    <- 1
   patch   <- 10
-
   forecast  <- array(dim=c(ndir,nvar))
   analysis  <- array(dim=c(ndir,nvar))
   increment <- array(dim=c(ndir,nvar))

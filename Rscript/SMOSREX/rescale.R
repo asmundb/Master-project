@@ -66,24 +66,23 @@ legend("topright",
 dev.off()
 
 
-
 #####  write files  #####
 
 # to path
 path <- "/lustre/storeB/users/asmundb/surfex/SMOSREX/OBSERVATIONS"
 
-use <- which(newobs[,2] == 600)
+use <- which(newobs[,2] %in% c(0,600,1200,1800))
 dates <- as.character(newobs[use,1])
+hours <- substr(sprintf("%04d",newobs[use,2]),1,2)
 obsout <- newobs[use,4]
 obsout[is.na(obsout)] <- 999
 
 i=1
 for (i in 1:length(obsout)){
   tmp1 <- strsplit(dates[i], "/")[[1]]
-  filename <- sprintf("%s/OBSERVATIONS_%s%s%sH06.DAT",path, substr(tmp1[3],3,4), tmp1[2], tmp1[1])
+  filename <- sprintf("%s/OBSERVATIONS_%s%s%sH%s.DAT",path, substr(tmp1[3],3,4), tmp1[2], tmp1[1], hours[i])
   write(obsout[i],file=filename, ncolumns=1)
 }
-
 
 
 

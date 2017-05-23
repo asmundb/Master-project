@@ -43,6 +43,7 @@ loadSMOSTimeserie <- function(path){
   sm <- array(dim=c(111,111,ndates*2))
   sf <- array(dim=c(111,111,ndates*2))
   dqx <- array(dim=c(111,111,ndates*2))
+  ef <- array(dim=c(111,111,ndates*2))
   
   # Mask
   
@@ -80,6 +81,8 @@ loadSMOSTimeserie <- function(path){
     Soil_moisture_D <- ncvar_get(ncid_D, ncid_D$var[[vars]])
     SM_dqx_A        <- ncvar_get(ncid_A, ncid_A$var$Soil_Moisture_Dqx)
     SM_dqx_D        <- ncvar_get(ncid_D, ncid_D$var$Soil_Moisture_Dqx)
+    event_flag_A    <- ncvar_get(ncid_A, ncid_A$var$Event_Flags)
+    event_flag_D    <- ncvar_get(ncid_D, ncid_D$var$Event_Flags)
     sci_flag_A      <- ncvar_get(ncid_A, ncid_A$var$Science_Flags)
     sci_flag_D      <- ncvar_get(ncid_D, ncid_D$var$Science_Flags)
     nc_close(ncid_A)
@@ -94,6 +97,9 @@ loadSMOSTimeserie <- function(path){
     tmp4 <- array(dim=c(111,111))
     tmp5 <- array(dim=c(111,111))
     tmp6 <- array(dim=c(111,111))
+    tmp7 <- array(dim=c(111,111))
+    tmp8 <- array(dim=c(111,111))
+
   
     # loop through points
     print("extract grid...")
@@ -106,6 +112,8 @@ loadSMOSTimeserie <- function(path){
         tmp4[j,i] <- SM_dqx_D[mask[1,k],mask[2,k]]
         tmp5[j,i] <- sci_flag_A[mask[1,k],mask[2,k]]
         tmp6[j,i] <- sci_flag_D[mask[1,k],mask[2,k]]
+        tmp7[j,i] <- event_flag_A[mask[1,k],mask[2,k]]
+        tmp8[j,i] <- event_flag_D[mask[1,k],mask[2,k]]
         k <- k+1
       }
     }
@@ -131,6 +139,8 @@ loadSMOSTimeserie <- function(path){
     sf[,,itime+1] <- tmp6 
     dqx[,,itime]  <- tmp3
     dqx[,,itime+1]<- tmp4
+    ef[,,itime]   <- tmp7
+    ef[,,itime+1] <- tmp8
   
     itime <- itime+2
     print("done")
@@ -139,7 +149,8 @@ loadSMOSTimeserie <- function(path){
   SMOS <- list( time=time,
                 sm=sm, 
                 sm_dqx=dqx,
-                sci_flag=sf ) 
+                sci_flag=sf,
+                evn_flag=ef ) 
   return(SMOS)
   
 }

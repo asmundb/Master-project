@@ -18,6 +18,8 @@ zs1 <- ncvar_get(ncid, ncid$var$ZS)
 nc_close(ncid)
 zs <- matrix(zs1, 111,111)
 
+
+# plot topography contours
 topo <- function(){
   contour(zs, add=T, levels=c(0,2,10,50,100,200,500,1000))
 }
@@ -95,10 +97,10 @@ for (i in 1:111){
     smos_cor[j,i] <- cor(smos_tc[j,i,], offline_tc[j,i,], use='na')
   }
 }
-pdf("figures/SMOS_evaluation/smos-offline_cor.pdf")
-image.plot(smos_cor, col=calla(smos_cor), main="SMOS OFFLINE correlation")
-topo()
-dev.off()
+#pdf("figures/SMOS_evaluation/smos-offline_cor.pdf")
+#image.plot(smos_cor, col=calla(smos_cor), main="SMOS OFFLINE correlation")
+#topo()
+#dev.off()
 
 
 ### DIFFERENCE ###
@@ -116,10 +118,10 @@ smosMoff_mean <- apply(smosMoff,c(1,2), mean, na.rm=T)
 N <- dim(smos_tc)[3]
 rmse <- sqrt(apply(smosMoff^2, c(1,2), sum,na.rm=T)/N)
 
-pdf("figures/SMOS_evaluation/smos-offline_rmse.pdf")
-image.plot(rmse,col=c("white",two.colors(start="white",end="black",middle="red")), main="SMOS OFFLINE RMSE")
-topo()
-dev.off()
+#pdf("figures/SMOS_evaluation/smos-offline_rmse.pdf")
+#image.plot(rmse,col=c("white",two.colors(start="white",end="black",middle="red")), main="SMOS OFFLINE RMSE")
+#topo()
+#dev.off()
 
 #
 #pdf("sm_mean.pdf")
@@ -181,8 +183,11 @@ dev.off()
 #dev.off()
 
 
-### Science Flags ###
 
+
+
+
+### COLOR FUNCTIONS ###
 calla <- function(x, start="red", end="blue", zero="white"){
   N <- 100
   minVal <- min(x,na.rm=T)
@@ -211,3 +216,11 @@ colTZ2 <- function(n=256, minVal=-1, maxVal=1, start="red", end="blue", zero="wh
   colo   <- designer.colors(n=n, c(start, zero, end), x=c(minVal, 0, maxVal))
   return(colo)
 } 
+
+
+
+
+
+
+
+
