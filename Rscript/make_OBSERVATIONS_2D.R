@@ -2,6 +2,7 @@
 
 library("ncdf4")
 source("functions.R")
+source("ffunctions.R")
 
 #####################################################################
 #################### USER PARAMETERS ################################
@@ -50,6 +51,23 @@ D_files <- files[grep(x=files, pattern="CLF31D")]
 # number of days
 ndates <- length(A_files)
 
+ncid <- nc_open(A_files[1])
+lat1     <- ncid$dim$lat$vals
+lon1     <- ncid$dim$lon$vals
+nc_close(ncid)
+
+print("finding nearest neighbour")
+ij <- matrix(NA, npoints,2)
+k=1
+for (k in 1:npoints){
+  cat(k, "of 12321\r")
+  ij[k,] <- fnn(lon1,lat1,I[k],J[k])
+  flush.console()
+}
+
+
+
+
 # specify variable name
 vars   <- c("Soil_Moisture")
 nvars  <- length(vars)
@@ -76,7 +94,7 @@ for (l in 1:ndates) {
 
   ###################################
   # find nearest neighbour and save value
-  print("finding nearest neighbour...")
+  print("Reading variables...")
   SM_points_A <- array(0,dim=c(npoints))  # up pass
   SM_points_D <- array(0,dim=c(npoints))  # down pass
   SM_points   <- array(0,dim=c(npoints))  # combined
@@ -87,10 +105,10 @@ for (l in 1:ndates) {
 
   # loop through points
   for (k in 1:npoints){
-    cat(k, "of 12321\r")
-    SM_points_A[k] <- Soil_moisture_A[nn(lon,lat,I[k],J[k])]
-    SM_points_D[k] <- Soil_moisture_D[nn(lon,lat,I[k],J[k])]
-    flush.console()
+#    cat(k, "of 12321\r")
+    SM_points_A[k] <- Soil_moisture_A[ij[k,1], ij[k,2]]
+    SM_points_D[k] <- Soil_moisture_D[ij[k,1], ij[k,2]]
+#    flush.console()
   }
   ##################################
   print("done")

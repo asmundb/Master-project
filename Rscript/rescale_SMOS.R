@@ -3,7 +3,7 @@ library(ncdf4)
 
 ### Load openloop ###
 print("Load openloop")
-path  <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/ISBA"
+path  <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/OPEN_LOOP_SPINUP/ISBA"
 files <- list.files(path=path,pattern="ISBA_PROGNOSTIC",recursive=T, full.names=T) 
 nfiles <- length(files)
 
@@ -44,3 +44,5 @@ for (i in 1:nfiles){
   outfile <- gsub("OBSERVATIONS//", "OBSERVATIONS_rescaled/", files[i])
   write(obs_new, file=outfile,ncolumns=1)
 }
+
+

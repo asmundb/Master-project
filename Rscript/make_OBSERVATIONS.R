@@ -13,7 +13,7 @@ source("ffunctions.R")
 path <- "/lustre/storeB/users/asmundb/SMOS/nc"
 
 # path to save OBSERVATIONS_XXXXXXXX.DAT files (input in soda)
-#outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/"
+outpath <- "/disk1/asmundb/SMOS/OBSERVATIONS/"
 
 #####################################################################
 #####################################################################
@@ -49,6 +49,22 @@ ndates <- length(A_files)
 vars   <- c("Soil_Moisture")
 nvars  <- length(vars)
 
+# NN
+
+ncid <- nc_open(A_files[1])
+lat     <- ncid$dim$lat$vals
+lon     <- ncid$dim$lon$vals
+nc_close(ncid)
+
+ij <- matrix(NA,npoints,2)
+k=1
+print(fnn(lon,lat,I[k],J[k]))
+#for (k in 1:npoints){
+#  ij[k,2] <- fnn(lon,lat,I[k],J[k])
+#}
+
+
+
 dataA <- array(dim=c(ndates, npoints))
 dataD <- array(dim=c(ndates, npoints))
 #start loop
@@ -79,19 +95,21 @@ for (l in 1:ndates) {
   # loop through points
   cat("1",'\r')
   for (k in 1:npoints){
-    SM_points_A[k] <- Soil_moisture_A[fnn(lon,lat,I[k],J[k])]
-    SM_points_D[k] <- Soil_moisture_D[fnn(lon,lat,I[k],J[k])]
+#    SM_points_A[k] <- Soil_moisture_A[fnn(lon,lat,I[k],J[k])]
+#    SM_points_D[k] <- Soil_moisture_D[fnn(lon,lat,I[k],J[k])]
+    SM_points_A[k] <- Soil_moisture_A[ij[k,]]
+    SM_points_D[k] <- Soil_moisture_D[ij[k,]]
   }
   cat("2", "\n")
   ##################################
 
   ### SAVE TO dataA/D
-  dataA[l,] <- SM_points_A
-  dataD[l,] <- SM_points_D
+#  dataA[l,] <- SM_points_A
+#  dataD[l,] <- SM_points_D
 
   # missing values is 999
-#  SM_points_A[which(is.na(SM_points_A))] <- 999
-#  SM_points_D[which(is.na(SM_points_D))] <- 999
+  SM_points_A[which(is.na(SM_points_A))] <- 999
+  SM_points_D[which(is.na(SM_points_D))] <- 999
 
   # make input file for SODA
   # Ascending satellite (A) at H06
@@ -99,10 +117,10 @@ for (l in 1:ndates) {
 
   outfile <- "OBSERVATIONS_"
   yymmdd <- substr(strsplit(strsplit(A_files[l],split="/")[[1]][6], split="_")[[1]][5],3,8)
-#  out_A <- paste(outpath, outfile, yymmdd,"H06", ".DAT", sep="")
-#  out_D <- paste(outpath, outfile, yymmdd,"H18", ".DAT", sep="")
-#  write(SM_points_A, out_A, ncolumns=1) #write to file
-#  write(SM_points_D, out_D, ncolumns=1) 
+  out_A <- paste(outpath, outfile, yymmdd,"H06", ".DAT", sep="")
+  out_D <- paste(outpath, outfile, yymmdd,"H18", ".DAT", sep="")
+  write(SM_points_A, out_A, ncolumns=1) #write to file
+  write(SM_points_D, out_D, ncolumns=1) 
   print(yymmdd)
 }
 # done 

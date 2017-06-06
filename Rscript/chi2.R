@@ -70,18 +70,21 @@ errDiag <- function(x, sigma_o, sigma_b){
   return(y)
 }
 
-XSIGMA_B <- rev(c(0.035399,  0.038154,  0.040139,  0.042590,  0.045341,  0.049871,  0.058721))
-B <- matrix(0, 7, 7)
-for (i in 1:7){
-  B[i,i] <- XSIGMA_B[i]^2
-}
 
+makeB <- function(XSIGMA_B){
+ #XSIGMA_B <- rev(c(0.035399,  0.038154,  0.040139,  0.042590,  0.045341,  0.049871,  0.058721))
+  B <- matrix(0, 7, 7)
+  for (i in 1:7){
+    B[i,i] <- XSIGMA_B[i]^2
+  }
+  return(B)
+}
 
 
 # More complicated computation with jacobian H
 
 
-errDiag2 <- function(x, HO){
+errDiag2 <- function(x, HO, B){
 
   daodbo <- array(NA, dim=c(111,111,44))    # dao*dbo
   y <- array(NA, dim=c(7,111,111,44))       # HBH^T 
@@ -117,25 +120,92 @@ errDiag2 <- function(x, HO){
   return(out)
 }
 
+# CHI^2 in time and space
+
+errDiag3 <- function(x,berr){
+  dbo <- x$yo[,,,1] - x$xf[,,,2]
+  dao <- x$yo[,,,1] - x$xa[,,,2]
+  dba <- x$xa[,,,2] - x$xf[,,,2]
+  xx <- dao*dbo
+  yy <- dba*dbo
+  ntimes <- dim(xx)[3]
+  R <- array(NA, dim=c(111,111))
+  B <- array(NA, dim=c(111,111))
+  chi2_o_tot <- array(NA, dim=c(111,111,ntimes))
+  chi2_b_tot <- array(NA, dim=c(111,111,ntimes))
+
+  for (i in 1:111){
+    for (j in 1:111){
+      R[j,i] <- x$obserr[j,i,1,1]#^2*PCOFSWI(clay[j,i])^2
+      B[j,i] <- berr^2*PCOFSWI(clay[j,i])^2
+    }
+  }
+
+  for (i in 1:ntimes){
+    chi2_o_tot[,,i] <- xx[,,i]/R
+    chi2_b_tot[,,i] <- yy[,,i]/B
+  }
 
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/SEKF_sat-wilt/ANALYSIS/"
-x04 <- loadSODA(path)
-y04 <- errDiag(x04,0.4,0.049871)
-HO04 <- loadHO(path)
-z04 <- errDiag2(x04,HO04)
+  out <- list(chi_o=chi2_o_tot, chi_b=chi2_b_tot)
+  return(out)
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_08/ANALYSIS"
-x08 <- loadSODA(path)
-y08 <- errDiag(x08,0.8,0.049871)
-HO08 <- loadHO(path)
-z08 <- errDiag2(x08,HO08)
+}
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_07/ANALYSIS"
+
+
+
+#B <- makeB(rev(c(0.035399,  0.038154,  0.040139,  0.042590,  0.045341,  0.049871,  0.058721)))
+
+#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs08/ANALYSIS"
+#x08 <- loadSODA(path)
+#y08 <- errDiag(x08,0.8,0.049871)
+#HO08 <- loadHO(path)
+#z08 <- errDiag2(x08,HO08,B)
+#y08 <- errDiag3(x08,0.4)
+
+
+#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs07/ANALYSIS"
+#x07 <- loadSODA(path)
+#y07 <- errDiag(x07,0.7,0.049871)
+#HO07 <- loadHO(path)
+#z07 <- errDiag2(x07,HO07,B)
+#y07 <- errDiag3(x07,0.4)
+
+#B2 <- makeB(rev(c(0.3,  0.2,  0.15,  0.1,  0.1,  0.06,  0.1)))
+
+#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs06/ANALYSIS"
+#x07b <- loadSODA(path)
+#y07b <- errDiag(x07b,0.7,0.06)
+#HO07b <- loadHO(path)
+#z07b <- errDiag2(x07b,HO07b,B2)
+#y07b <- errDiag3(x07b,0.4)
+
+#B2 <- makeB(rev(c(0.1,  0.1,  0.1,  0.1,  0.1,  0.1,  0.1)))
+
+
+#B2 <- makeB(rev(c(0.2,  0.2,  0.2,  0.2,  0.2,  0.4,  0.2)))
+
+#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_3/ANALYSIS"
+#x07b3 <- loadSODA(path)
+#y07b2 <- errDiag(x07b2,0.7,0.1)
+#HO07b2 <- loadHO(path)
+#z07b2 <- errDiag2(x07b2,HO07b2,B2)
+#y07b3 <- errDiag3(x07b3)
+
+path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs06/ANALYSIS"
+x06 <- loadSODA(path)
+y06 <- errDiag3(x06,0.4)
+
+
+path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs07/ANALYSIS"
 x07 <- loadSODA(path)
-y07 <- errDiag(x07,0.7,0.049871)
-HO07 <- loadHO(path)
-z07 <- errDiag2(x07,HO07)
+y07 <- errDiag3(x07,0.4)
+
+path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs08/ANALYSIS"
+x08 <- loadSODA(path)
+y08 <- errDiag3(x08,0.4)
+
 
 
 stop("hei")
@@ -148,8 +218,90 @@ stop("hei")
 #legend("topright",legend=sprintf("%s%d%s%f",expression(sigma^2),1:7,"=",XSIGMA_B))
 
 
-
-plot(z04$dbadbo/z04$hbht,type='o', main=expression(chi^2 : E(d[b]^a*d[b]^o) / HBH^T), ylab=expression(chi^2),ylim=c(0,20))
+pdf("figures/chi2/HBHT.pdf")
+plot(z04$dbadbo/z04$hbht,type='o', main=expression(chi^2 : E(d[b]^a*d[b]^o) / HBH^T), ylab=expression(chi^2),log="y", ylim=c(1,2000))
 lines(z08$dbadbo/z08$hbht,type='o',col="red")
 lines(z07$dbadbo/z07$hbht,type='o',col="blue")
-legend("topleft",legend=paste("obserr=",c("0.4","0.8","0.7"),sep=""), lty=1, fill=c("black","red","blue"))
+lines(z07b$dbadbo/z07b$hbht,type='o',col="darkblue")
+legend("topleft",legend=paste("obserr=",c("0.4","0.8","0.7","0.7 b"),sep=""), lty=1, fill=c("black","red","blue","darkblue"))
+dev.off()
+
+
+# Statistical significance
+
+
+converg <- function(A){
+  iters <- dim(A)[3]
+  m <- numeric(iters)
+  sigma <- numeric(iters)
+  for (i in 1:iters){
+    m[i] <- mean(A[,,1:i],na.rm=T)
+    sigma[i] <- sd(A[,,1:i],na.rm=T)
+  }
+  out <- list(mean=m,sd=sigma)
+  return(out)
+}
+
+
+x <- 
+y <- converg(y07)[seq(1,44,by=2)]
+
+its <- 5:22
+LM <- lm(log(conv2[5:22])~log(its))
+P <- predict(LM, data.frame(its = 1:100))
+X <- exp(P)
+
+plot(y,xlim=c(0,100))
+lines(X)
+
+
+pdf("figures/chi2/convergence_of_chisquare_b08.pdf")
+plot(apply(y08$chi_b, 3 , mean, na.rm=T), main=expression(chi^2-test: "obserr=0.8"), xlab="analysis i", ylab=expression(chi^2))
+lines(converg(y08$chi_b)$mean, lty=1)
+abline(h=1, lty=2, lwd=0.5)
+legend("topright",legend=c("mean at t=i", "mean from t=1 to t=i", "chi^2=1" ), lty=c(NA,1,2), pch=c(1,NA,NA))
+dev.off()
+
+conv2 <- function(A){
+  Y <- sample(as.numeric(A))
+  n <- length(Y)
+  m <- numeric(n)
+  s <- numeric(n)
+  for (i in 1:n){
+    m[i] <- mean(A[1:i],na.rm=T)
+    s[i] <- sd(A[1:i],na.rm=T)
+  }
+  out <- list(mean=m, sd=s)
+  return(out)
+}
+
+
+# Table
+
+
+oe <- c(0.6,0.7 ,0.7,0.7,0.8)
+be <- c(0.4,0.06,0.1,0.4,0.4)
+chio <- c(mean(y06$chi_o,na.rm=T), mean(y07b1$chi_o,na.rm=T), mean(y07b2$chi_o,na.rm=T),mean(y07b2$chi_o,na.rm=T),mean(y08$chi_o,na.rm=T))
+chib <- c(mean(y06$chi_b,na.rm=T), mean(y07b1$chi_b,na.rm=T), mean(y07b2$chi_b,na.rm=T),mean(y07b2$chi_b,na.rm=T),mean(y08$chi_b,na.rm=T))
+
+
+
+# Polynomial interpolation
+p <- function(x,xi,yi){
+  len <- length(x)
+  n <- length(xi)
+  p <- numeric(len)
+  for (i in 1:n){  # sum
+    m <- rep(1,len)
+    for (j in 1:n){ # multiply
+      if (j != i){
+        m <- m * (x-xi[j])/(xi[i]-xi[j])
+      }
+    }
+    p <- p + m*yi[i]
+  }
+  return(p)
+}
+
+
+

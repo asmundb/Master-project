@@ -201,3 +201,11 @@ for (i in 1:(end-start)){
   dev.off()
 }
 
+
+### loaded from chi2.R
+
+
+pdf("figures/lowclouds/increment_sum.pdf")
+image.plot(apply(x07$inc[,,,1],1:2, sum,na.rm=T), main="sum of increments, 10.sep-17.oct 2016", col=rev(tim.colors()))
+topo()
+dev.off()
