@@ -44,7 +44,7 @@ npoints <- length(I)
 # should probably find a better way to run program
 # and list files ??                    "SM_RE04.*"
 print("listing files...")
-files <- list.files(path=path, pattern="SM_OPER.*", full.name=T) # test if nc mabye
+files <- list.files(path=path, pattern="SM_RE04.*", full.name=T) # test if nc mabye
 A_files <- files[grep(x=files, pattern="CLF31A")]
 D_files <- files[grep(x=files, pattern="CLF31D")]
 

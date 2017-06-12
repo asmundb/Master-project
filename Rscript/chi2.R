@@ -207,6 +207,17 @@ x08 <- loadSODA(path)
 y08 <- errDiag3(x08,0.4)
 
 
+path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b08/ANALYSIS"
+x07b08 <- loadSODA(path)
+y07b08 <- errDiag3(x07b08,0.8)
+
+path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b02/ANALYSIS"
+x07b02 <- loadSODA(path)
+y07b02 <- errDiag3(x07b02,0.2)
+
+
+
+
 
 stop("hei")
 
@@ -279,10 +290,23 @@ conv2 <- function(A){
 # Table
 
 
-oe <- c(0.6,0.7 ,0.7,0.7,0.8)
-be <- c(0.4,0.06,0.1,0.4,0.4)
-chio <- c(mean(y06$chi_o,na.rm=T), mean(y07b1$chi_o,na.rm=T), mean(y07b2$chi_o,na.rm=T),mean(y07b2$chi_o,na.rm=T),mean(y08$chi_o,na.rm=T))
-chib <- c(mean(y06$chi_b,na.rm=T), mean(y07b1$chi_b,na.rm=T), mean(y07b2$chi_b,na.rm=T),mean(y07b2$chi_b,na.rm=T),mean(y08$chi_b,na.rm=T))
+oe <- c(0.6,0.7 ,0.7,0.7,0.7,0.7,0.8)
+be <- c(0.4,0.06,0.1,0.2,0.4,0.8,0.4)
+chio <- c(mean(y06$chi_o,na.rm=T), 
+          mean(y07b1$chi_o,na.rm=T), 
+          mean(y07b2$chi_o,na.rm=T),
+          mean(y07b02$chi_o,na.rm=T),
+          mean(y07b3$chi_o,na.rm=T),
+          mean(y07b08$chi_o,na.rm=T), 
+          mean(y08$chi_o,na.rm=T))
+
+chib <- c(mean(y06$chi_b,na.rm=T), 
+          mean(y07b1$chi_b,na.rm=T), 
+          mean(y07b2$chi_b,na.rm=T),
+          mean(y07b02$chi_b,na.rm=T),
+          mean(y07b3$chi_b,na.rm=T),
+          mean(y07b08$chi_b,na.rm=T),
+          mean(y08$chi_b,na.rm=T))
 
 
 

@@ -26,24 +26,24 @@ load_isba <- function(files, vars){
 
 }
 
-time <- seq(as.POSIXlt("2016-09-10 01:00"), as.POSIXlt("2016-10-17 00:00") by=3600)
+time <- seq(as.POSIXlt("2016-09-10 01:00"), as.POSIXlt("2016-10-17 00:00"), by=3600)
 
 vars <- c("WG1","WG2", "TG1", "TG2")
 
 
 # open loop 
-path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/lowcloud/OPEN_LOOP_SPINUP/ISBA/"
-files1 <- list.files(path,   
-                    pattern="ISBA_PROGNOSTIC.OUT.nc",   
-                    recursive=T,
-                    full.names=T)[529:676]
-ol <- load_isba(files1, vars)
+#path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2014/SPINUP/ISBA/"
+#files1 <- list.files(path,   
+#                    pattern="ISBA_PROGNOSTIC.OUT.nc",   
+##                    recursive=T,
+#                    full.names=T)
+#ol <- load_isba(files1, vars)
 
 # SEKF
-path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs07/ISBA/"
-files2 <- list.files(path,   
-                    pattern="ISBA_PROGNOSTIC.OUT.nc",   
-                    recursive=T,
-                    full.names=T)
-
-sekf <- load_isba(files2, vars)
+#path <- "/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs07/ISBA/"
+#files2 <- list.files(path,   
+#                    pattern="ISBA_PROGNOSTIC.OUT.nc",   
+#                    recursive=T,
+#                    full.names=T)
+#
+#sekf <- load_isba(files2, vars)
