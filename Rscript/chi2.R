@@ -193,27 +193,27 @@ errDiag3 <- function(x,berr){
 #z07b2 <- errDiag2(x07b2,HO07b2,B2)
 #y07b3 <- errDiag3(x07b3)
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs06/ANALYSIS"
-x06 <- loadSODA(path)
-y06 <- errDiag3(x06,0.4)
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs06_b005/ANALYSIS"
+#x06 <- loadSODA(path)
+#y06 <- errDiag3(x06,0.05)
 
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs07/ANALYSIS"
+path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs07_b02/ANALYSIS"
 x07 <- loadSODA(path)
-y07 <- errDiag3(x07,0.4)
+y07 <- errDiag3(x07,0.2)
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs08/ANALYSIS"
-x08 <- loadSODA(path)
-y08 <- errDiag3(x08,0.4)
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs08_b005/ANALYSIS"
+#x08 <- loadSODA(path)
+#y08 <- errDiag3(x08,0.05)
 
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b08/ANALYSIS"
-x07b08 <- loadSODA(path)
-y07b08 <- errDiag3(x07b08,0.8)
+#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b08/ANALYSIS"
+#x07b08 <- loadSODA(path)
+#y07b08 <- errDiag3(x07b08,0.8)
 
-path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b02/ANALYSIS"
-x07b02 <- loadSODA(path)
-y07b02 <- errDiag3(x07b02,0.2)
+#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b02/ANALYSIS"
+#x07b02 <- loadSODA(path)
+#y07b02 <- errDiag3(x07b02,0.2)
 
 
 
@@ -245,33 +245,17 @@ converg <- function(A){
   iters <- dim(A)[3]
   m <- numeric(iters)
   sigma <- numeric(iters)
+  S <- 0
   for (i in 1:iters){
-    m[i] <- mean(A[,,1:i],na.rm=T)
-    sigma[i] <- sd(A[,,1:i],na.rm=T)
+     S <- S + sum(A[,,i],na.rm=T)
+     m[i] <- S
+#    m[i] <- mean(A[,,1:i],na.rm=T)
+#    sigma[i] <- sd(A[,,1:i],na.rm=T)
   }
-  out <- list(mean=m,sd=sigma)
-  return(out)
+  m <- m/(1:iters)
+#  out <- list(mean=m,sd=sigma)
+  return(m)
 }
-
-
-x <- 
-y <- converg(y07)[seq(1,44,by=2)]
-
-its <- 5:22
-LM <- lm(log(conv2[5:22])~log(its))
-P <- predict(LM, data.frame(its = 1:100))
-X <- exp(P)
-
-plot(y,xlim=c(0,100))
-lines(X)
-
-
-pdf("figures/chi2/convergence_of_chisquare_b08.pdf")
-plot(apply(y08$chi_b, 3 , mean, na.rm=T), main=expression(chi^2-test: "obserr=0.8"), xlab="analysis i", ylab=expression(chi^2))
-lines(converg(y08$chi_b)$mean, lty=1)
-abline(h=1, lty=2, lwd=0.5)
-legend("topright",legend=c("mean at t=i", "mean from t=1 to t=i", "chi^2=1" ), lty=c(NA,1,2), pch=c(1,NA,NA))
-dev.off()
 
 conv2 <- function(A){
   Y <- sample(as.numeric(A))
@@ -285,6 +269,27 @@ conv2 <- function(A){
   out <- list(mean=m, sd=s)
   return(out)
 }
+
+
+x <- 
+y <- converg(y06)[seq(1,368,by=2)]
+nnn <- 
+
+its <- 5:22
+LM <- lm(log(conv2[5:22])~log(its))
+P <- predict(LM, data.frame(its = 1:100))
+X <- exp(P)
+
+plot(y,xlim=c(0,100))
+lines(X)
+
+
+pdf("figures/chi2/convergence_of_chisquare_06.pdf")
+plot(apply(y06$chi_o, 3 , mean, na.rm=T), main=expression(chi^2-test: "obserr=0.6"), xlab="analysis i", ylab=expression(chi^2))
+lines(x$mean, lty=1)
+abline(h=1, lty=2, lwd=0.5)
+legend("topright",legend=c("mean at t=i", "mean from t=1 to t=i", "chi^2=1" ), lty=c(NA,1,2), pch=c(1,NA,NA))
+dev.off()
 
 
 # Table
@@ -327,5 +332,14 @@ p <- function(x,xi,yi){
   return(p)
 }
 
+
+
+# RUN TIME
+
+nproc <- c(1,2,4,8,16,32)
+tim <- c(2*60+36.961, 51.74, 41.241, 32.827, 30.327, 39.041)
+pdf("figures/runtime.pdf")
+plot(nproc,tim, xlab="processors", ylab="elapsed time [s]", main="OFFLINE run time", type='o')
+dev.off()
 
 
