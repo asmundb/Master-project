@@ -153,14 +153,14 @@ errDiag3 <- function(x,berr){
 }
 
 
-
+#stop()
 
 #B <- makeB(rev(c(0.035399,  0.038154,  0.040139,  0.042590,  0.045341,  0.049871,  0.058721)))
 
 #path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/obserr/SEKF_obs08/ANALYSIS"
 #x08 <- loadSODA(path)
 #y08 <- errDiag(x08,0.8,0.049871)
-#HO08 <- loadHO(path)
+#OFSWI(clay=clay)
 #z08 <- errDiag2(x08,HO08,B)
 #y08 <- errDiag3(x08,0.4)
 
@@ -183,7 +183,6 @@ errDiag3 <- function(x,berr){
 
 #B2 <- makeB(rev(c(0.1,  0.1,  0.1,  0.1,  0.1,  0.1,  0.1)))
 
-
 #B2 <- makeB(rev(c(0.2,  0.2,  0.2,  0.2,  0.2,  0.4,  0.2)))
 
 #path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_3/ANALYSIS"
@@ -196,150 +195,144 @@ errDiag3 <- function(x,berr){
 #path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs06_b005/ANALYSIS"
 #x06 <- loadSODA(path)
 #y06 <- errDiag3(x06,0.05)
-
-
-path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs07_b02/ANALYSIS"
-x07 <- loadSODA(path)
-y07 <- errDiag3(x07,0.2)
-
-#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs08_b005/ANALYSIS"
-#x08 <- loadSODA(path)
-#y08 <- errDiag3(x08,0.05)
-
-
-#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b08/ANALYSIS"
-#x07b08 <- loadSODA(path)
-#y07b08 <- errDiag3(x07b08,0.8)
-
-#path="/lustre/storeB/users/asmundb/surfex/RESULTS/2016/moderr/SEKF_obs07_b02/ANALYSIS"
+#
+#
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs06_b005/ANALYSIS"
+#x06b005 <- loadSODA(path)
+#y06b005 <- errDiag3(x06b005,0.05)
+#
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs06_b02/ANALYSIS"
+#x06b02 <- loadSODA(path)
+#y06b02 <- errDiag3(x06b02,0.2)
+#
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs07_b005/ANALYSIS"
+#x07b005 <- loadSODA(path)
+#y07b005 <- errDiag3(x07b005,0.05)
+#
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs07_b02/ANALYSIS"
 #x07b02 <- loadSODA(path)
 #y07b02 <- errDiag3(x07b02,0.2)
-
-
-
-
-
-stop("hei")
-
-
-#plot(yy/zz)
-
 #
-#plot(yy/zz,type='o', ylab=expression(chi^2), main=expression(chi^2 : E(d[b]^a*d[b]^o) / HBH^T))
-#legend("topright",legend=sprintf("%s%d%s%f",expression(sigma^2),1:7,"=",XSIGMA_B))
-
-
-pdf("figures/chi2/HBHT.pdf")
-plot(z04$dbadbo/z04$hbht,type='o', main=expression(chi^2 : E(d[b]^a*d[b]^o) / HBH^T), ylab=expression(chi^2),log="y", ylim=c(1,2000))
-lines(z08$dbadbo/z08$hbht,type='o',col="red")
-lines(z07$dbadbo/z07$hbht,type='o',col="blue")
-lines(z07b$dbadbo/z07b$hbht,type='o',col="darkblue")
-legend("topleft",legend=paste("obserr=",c("0.4","0.8","0.7","0.7 b"),sep=""), lty=1, fill=c("black","red","blue","darkblue"))
-dev.off()
-
-
-# Statistical significance
-
-
-converg <- function(A){
-  iters <- dim(A)[3]
-  m <- numeric(iters)
-  sigma <- numeric(iters)
-  S <- 0
-  for (i in 1:iters){
-     S <- S + sum(A[,,i],na.rm=T)
-     m[i] <- S
-#    m[i] <- mean(A[,,1:i],na.rm=T)
-#    sigma[i] <- sd(A[,,1:i],na.rm=T)
-  }
-  m <- m/(1:iters)
-#  out <- list(mean=m,sd=sigma)
-  return(m)
-}
-
-conv2 <- function(A){
-  Y <- sample(as.numeric(A))
-  n <- length(Y)
-  m <- numeric(n)
-  s <- numeric(n)
-  for (i in 1:n){
-    m[i] <- mean(A[1:i],na.rm=T)
-    s[i] <- sd(A[1:i],na.rm=T)
-  }
-  out <- list(mean=m, sd=s)
-  return(out)
-}
-
-
-x <- 
-y <- converg(y06)[seq(1,368,by=2)]
-nnn <- 
-
-its <- 5:22
-LM <- lm(log(conv2[5:22])~log(its))
-P <- predict(LM, data.frame(its = 1:100))
-X <- exp(P)
-
-plot(y,xlim=c(0,100))
-lines(X)
-
-
-pdf("figures/chi2/convergence_of_chisquare_06.pdf")
-plot(apply(y06$chi_o, 3 , mean, na.rm=T), main=expression(chi^2-test: "obserr=0.6"), xlab="analysis i", ylab=expression(chi^2))
-lines(x$mean, lty=1)
-abline(h=1, lty=2, lwd=0.5)
-legend("topright",legend=c("mean at t=i", "mean from t=1 to t=i", "chi^2=1" ), lty=c(NA,1,2), pch=c(1,NA,NA))
-dev.off()
-
-
-# Table
-
-
-oe <- c(0.6,0.7 ,0.7,0.7,0.7,0.7,0.8)
-be <- c(0.4,0.06,0.1,0.2,0.4,0.8,0.4)
-chio <- c(mean(y06$chi_o,na.rm=T), 
-          mean(y07b1$chi_o,na.rm=T), 
-          mean(y07b2$chi_o,na.rm=T),
-          mean(y07b02$chi_o,na.rm=T),
-          mean(y07b3$chi_o,na.rm=T),
-          mean(y07b08$chi_o,na.rm=T), 
-          mean(y08$chi_o,na.rm=T))
-
-chib <- c(mean(y06$chi_b,na.rm=T), 
-          mean(y07b1$chi_b,na.rm=T), 
-          mean(y07b2$chi_b,na.rm=T),
-          mean(y07b02$chi_b,na.rm=T),
-          mean(y07b3$chi_b,na.rm=T),
-          mean(y07b08$chi_b,na.rm=T),
-          mean(y08$chi_b,na.rm=T))
-
-
-
-# Polynomial interpolation
-p <- function(x,xi,yi){
-  len <- length(x)
-  n <- length(xi)
-  p <- numeric(len)
-  for (i in 1:n){  # sum
-    m <- rep(1,len)
-    for (j in 1:n){ # multiply
-      if (j != i){
-        m <- m * (x-xi[j])/(xi[i]-xi[j])
-      }
-    }
-    p <- p + m*yi[i]
-  }
-  return(p)
-}
-
-
-
-# RUN TIME
-
-nproc <- c(1,2,4,8,16,32)
-tim <- c(2*60+36.961, 51.74, 41.241, 32.827, 30.327, 39.041)
-pdf("figures/runtime.pdf")
-plot(nproc,tim, xlab="processors", ylab="elapsed time [s]", main="OFFLINE run time", type='o')
-dev.off()
-
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs08_b005/ANALYSIS"
+#x08b005 <- loadSODA(path)
+#y08b005 <- errDiag3(x08b005,0.05)
+#
+#path="/lustre/storeA/users/asmundb/surfex/RESULTS/2014/SEKF/obs08_b02/ANALYSIS"
+#x08b02 <- loadSODA(path)
+#y08b02 <- errDiag3(x08b02,0.2)
+#
+#
+#stop("hei")
+#
+#
+##plot(yy/zz)
+#
+##
+##plot(yy/zz,type='o', ylab=expression(chi^2), main=expression(chi^2 : E(d[b]^a*d[b]^o) / HBH^T))
+##legend("topright",legend=sprintf("%s%d%s%f",expression(sigma^2),1:7,"=",XSIGMA_B))
+#
+#
+#pdf("figures/chi2/HBHT.pdf")
+#plot(z04$dbadbo/z04$hbht,type='o', main=expression(chi^2 : E(d[b]^a*d[b]^o) / HBH^T), ylab=expression(chi^2),log="y", ylim=c(1,2000))
+#lines(z08$dbadbo/z08$hbht,type='o',col="red")
+#lines(z07$dbadbo/z07$hbht,type='o',col="blue")
+#lines(z07b$dbadbo/z07b$hbht,type='o',col="darkblue")
+#legend("topleft",legend=paste("obserr=",c("0.4","0.8","0.7","0.7 b"),sep=""), lty=1, fill=c("black","red","blue","darkblue"))
+#dev.off()
+#
+#
+## Statistical significance
+#
+#
+#converg <- function(A){
+#  iters <- dim(A)[3]
+#   
+#  S <- numeric(iters)
+#  N <- numeric(iters)
+#
+#  S[1] <- sum(A[,,1],na.rm=T)
+#  N[1] <- sum(!is.na(A[,,1]))
+#  
+#  for (i in 2:iters){
+#    S[i] <- S[i-1] + sum(A[,,i],na.rm=T)
+#    N[i] <- N[i-1] + sum(!is.na(A[,,i]))
+#  }
+#  
+#  M <- S/N
+#  M[which(is.infinite(M))] <- NA
+#
+#  return(M)
+#}
+#
+## CONVERGENCE OF CHI^2 EXPECTATION VALUE
+#
+#con <- converg(A)[seq(1,368,by=2)]
+#
+#its <- 5:22
+#LM <- lm(log(conv2[5:22])~log(its))
+#P <- predict(LM, data.frame(its = 1:100))
+#X <- exp(P)
+#
+#plot(y,xlim=c(0,100))
+#lines(X)
+#
+#
+#pdf("figures/chi2/convergence_of_chisquare_06.pdf")
+#plot(apply(y06$chi_o, 3 , mean, na.rm=T), main=expression(chi^2-test: "obserr=0.6"), xlab="analysis i", ylab=expression(chi^2))
+#lines(x$mean, lty=1)
+#abline(h=1, lty=2, lwd=0.5)
+#legend("topright",legend=c("mean at t=i", "mean from t=1 to t=i", "chi^2=1" ), lty=c(NA,1,2), pch=c(1,NA,NA))
+#dev.off()
+#
+#
+## Table
+#
+#
+#oe <- c(0.6,0.7 ,0.7,0.7,0.7,0.7,0.8)
+#be <- c(0.4,0.06,0.1,0.2,0.4,0.8,0.4)
+#chio <- c(mean(y06$chi_o,na.rm=T), 
+#          mean(y07b1$chi_o,na.rm=T), 
+#          mean(y07b2$chi_o,na.rm=T),
+#          mean(y07b02$chi_o,na.rm=T),
+#          mean(y07b3$chi_o,na.rm=T),
+#          mean(y07b08$chi_o,na.rm=T), 
+#          mean(y08$chi_o,na.rm=T))
+#
+#chib <- c(mean(y06$chi_b,na.rm=T), 
+#          mean(y07b1$chi_b,na.rm=T), 
+#          mean(y07b2$chi_b,na.rm=T),
+#          mean(y07b02$chi_b,na.rm=T),
+#          mean(y07b3$chi_b,na.rm=T),
+#          mean(y07b08$chi_b,na.rm=T),
+#          mean(y08$chi_b,na.rm=T))
+#
+#
+#
+## Polynomial interpolation
+#p <- function(x,xi,yi){
+#  len <- length(x)
+#  n <- length(xi)
+#  p <- numeric(len)
+#  for (i in 1:n){  # sum
+#    m <- rep(1,len)
+#    for (j in 1:n){ # multiply
+#      if (j != i){
+#        m <- m * (x-xi[j])/(xi[i]-xi[j])
+#      }
+#    }
+#    p <- p + m*yi[i]
+#  }
+#  return(p)
+#}
+#
+#
+#
+## RUN TIME
+#
+#nproc <- c(1,2,4,8,16,32)
+#tim <- c(2*60+36.961, 51.74, 41.241, 32.827, 30.327, 39.041)
+#pdf("figures/runtime.pdf")
+#plot(nproc,tim, xlab="processors", ylab="elapsed time [s]", main="OFFLINE run time", type='o')
+#dev.off()
+#
 

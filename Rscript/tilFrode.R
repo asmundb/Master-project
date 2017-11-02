@@ -20,6 +20,24 @@ mat_cor <- function(x,y){
 }
 
 
+mat_rmse <- function(x,y){
+  if (all(dim(x) != dim(y))){
+    print("fu")
+    stop()
+  }
+  rmse <- array(NA, dim=dim(x)[1:2])
+  for (i in 1:dim(x)[2]){
+    for (j in 1:dim(x)[1]){
+      rmse[j,i] <- rmsd(x[j,i,], y[j,i,])
+    }
+  }
+  return(rmse)
+}
+
+rmsd <- function(x,y){
+  rmsd <- sqrt(sum((x-y)^2,na.rm=T)/length(x))
+  return(rmsd)
+}
 
 
 
@@ -217,6 +235,11 @@ kise <- 12550
 blon <- 10.9583
 blat <- 60.7908
 
+dagali <- 29720
+blon <- 8.5263
+blat <- 60.4188
+
+
 bij <- fnn_lamb(I,J,blon,blat)$ij_out
 m <- matrix(1:length(I),111,111)
 ob <- which(m == bij, arr.ind=T)
@@ -227,7 +250,7 @@ plot(diag$T2M_ISBA[ob[1],ob[2],],type="l")
 
 getObs <- function(tab, P, fd, td, stnr){
        URL <- sprintf("http://klapp/metnopub/production/metno?re=30&tab=%s&%s&fd=%s&td=%s&split=0&nmt=0&ddel=dot&del=;&ct=text/plain&s=%s", tab, P, fd,td, stnr)
-       df <- read.table(URL,na.strings=c("-",".","<NA>"), header=TRUE)source("topo.R")
+       df <- read.table(URL,na.strings=c("-",".","<NA>"), header=TRUE)
        colnames(df)[2] <- "TIME"
        df[,"TIME"] <- gsub('\\D','\\1',df[,"TIME"])
        return(df)
@@ -394,3 +417,16 @@ dev.off()
 
 
 
+
+
+##########################################################
+
+smos <- readRDS("RDS_files/SEKF_smos.rds")
+smap <- readRDS("RDS_files/SEKF_smap.rds")
+
+smos_obs <- smos$yo[,,,1]
+smos_inc <- smos$inc[,,,2]
+smos_innov <- smos$innov[,,,1]
+
+smos_inc[which(is.na(smos_obs))] <- NA
+smos_innov[which(is.na(smos_obs))] <- NA

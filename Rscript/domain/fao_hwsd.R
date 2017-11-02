@@ -26,8 +26,8 @@ readSFX <- function(file, vars){
 
 # PGD 
 pgd_vars     <- c("SAND","CLAY","FRAC_NATURE","ZS")
-pgd_fao  <- readSFX(file="fao_hwsd/PGD_fao.nc",pgd_vars)
-pgd_HWSD <- readSFX(file="fao_hwsd/PGD_HWSD_MOY.nc",pgd_vars)
+pgd_fao  <- readSFX(file="surfex_files/PGD_2D.nc",pgd_vars)
+pgd_HWSD <- readSFX(file="surfex_files/PGD_hwsd.nc",pgd_vars)
 
 zs <- pgd_fao$ZS
 # PREP
@@ -38,6 +38,17 @@ prep_HWSD <- readSFX(file="fao_hwsd/PREP_HWSD_MOY.nc",prep_vars)
 #### PLOTTING ####
 
 require(fields)
+
+pdf("figures/other/fao_clay.pdf", width=2.5, height=2)
+par(mar=c(2,2,1.7,1))
+image.plot(pgd_fao$CLAY,col=tim.colors(),main="FAO clay fraction",zlim=c(0.04,0.33),legend.width=0.5, legend.mar=4)
+dev.off()
+
+pdf("figures/other/hwsd_clay.pdf", width=2.5, height=2)
+par(mar=c(2,2,1.7,1))
+image.plot(pgd_HWSD$CLAY,col=tim.colors(),main="HWSD clay fraction",zlim=c(0.04,0.33),legend.width=0.5, legend.mar=4)
+dev.off()
+
 
 plotAllVars <- function(varList){
   listName <- deparse(substitute(varList))

@@ -43,6 +43,7 @@ filename <- "surfex_files/PREP_SODA.nc"
 ncid <- nc_open(filename)
 wwilt1 <- ncvar_get(ncid, ncid$var$WWILT1)
 wfc1   <- ncvar_get(ncid, ncid$var$WFC1)
+wsat   <- ncvar_get(ncid,ncid$var$WSAT1)
 nc_close(ncid)
 
 ### AROME-METCOOP ###
@@ -133,6 +134,29 @@ loadHO <- function(path){
   HO <- list( H=H, K=K )  
   return(HO)
 }
+
+
+loadSODA <- function(path){
+  print("read analysis files")
+  ana    <- load001(path, "ANAL_INCR")
+  xa     <- ana[,,,7:1]                  # Analysis
+  inc    <- ana[,,,14:8]                 # increment
+  xf     <- xa-inc                       # background
+  rm(ana)
+
+  yo     <- load001(path, "OBSout")      # observation
+  innov  <- load001(path, "INNOV")       # innovation
+  obserr <- load001(path, "OBSERRORout") # observation error
+
+  x <- list( xa=xa,
+             xf=xf,
+             yo=yo,
+             inc=inc,
+             innov=innov,
+             obserr=obserr )
+  return(x)
+}
+
 
 
 

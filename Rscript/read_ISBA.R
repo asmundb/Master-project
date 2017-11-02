@@ -26,9 +26,9 @@ load_isba <- function(files, vars){
 
 }
 
-time <- seq(as.POSIXlt("2016-09-10 01:00"), as.POSIXlt("2016-10-17 00:00"), by=3600)
+##time <- seq(as.POSIXlt("2016-09-10 01:00"), as.POSIXlt("2016-10-17 00:00"), by=3600)
 
-vars <- c("WG1","WG2", "TG1", "TG2")
+#vars <- c("WG1","WG2", "TG1", "TG2")
 
 
 # open loop 

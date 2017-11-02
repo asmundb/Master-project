@@ -4,7 +4,7 @@ library("ncdf4")
 source("ffunctions.R")
 
 
-loadSMOSTimeserie <- function(path){
+loadSMOSTimeserie <- function(files){
 
   print("reading coordinates from forcing...")
   ncid <- nc_open("surfex_files/FORCING.nc")
@@ -24,8 +24,8 @@ loadSMOSTimeserie <- function(path){
   # files to open
   # should probably find a better way to run program
   # and list files ??                    "SM_RE04.*"
-  print("listing files...")
-  files <- list.files(path=path, pattern="SM_OPER.*", full.name=T) # test if nc mabye
+#  print("listing files...")
+#  files <- list.files(path=path, pattern="SM_OPER.*", full.name=T) # test if nc mabye
   A_files <- files[grep(x=files, pattern="CLF31A")]
   D_files <- files[grep(x=files, pattern="CLF31D")]
   
@@ -44,6 +44,7 @@ loadSMOSTimeserie <- function(path){
   sf <- array(dim=c(111,111,ndates*2))
   dqx <- array(dim=c(111,111,ndates*2))
   ef <- array(dim=c(111,111,ndates*2))
+  rfip <- array(dim=c(111,111,ndates*2))
   
   # Mask
   
@@ -85,20 +86,25 @@ loadSMOSTimeserie <- function(path){
     event_flag_D    <- ncvar_get(ncid_D, ncid_D$var$Event_Flags)
     sci_flag_A      <- ncvar_get(ncid_A, ncid_A$var$Science_Flags)
     sci_flag_D      <- ncvar_get(ncid_D, ncid_D$var$Science_Flags)
+    rfip_A          <- ncvar_get(ncid_A, ncid_A$var$Rfi_Prob)
+    rfip_D          <- ncvar_get(ncid_D, ncid_D$var$Rfi_Prob)
     nc_close(ncid_A)
     nc_close(ncid_D)
     print("done")
     ###################################
   
   
-    tmp1 <- array(dim=c(111,111))
-    tmp2 <- array(dim=c(111,111))
-    tmp3 <- array(dim=c(111,111))
-    tmp4 <- array(dim=c(111,111))
-    tmp5 <- array(dim=c(111,111))
-    tmp6 <- array(dim=c(111,111))
-    tmp7 <- array(dim=c(111,111))
-    tmp8 <- array(dim=c(111,111))
+    tmp1  <- array(dim=c(111,111))
+    tmp2  <- array(dim=c(111,111))
+    tmp3  <- array(dim=c(111,111))
+    tmp4  <- array(dim=c(111,111))
+    tmp5  <- array(dim=c(111,111))
+    tmp6  <- array(dim=c(111,111))
+    tmp7  <- array(dim=c(111,111))
+    tmp8  <- array(dim=c(111,111))
+    tmp9  <- array(dim=c(111,111))
+    tmp10 <- array(dim=c(111,111))
+
 
   
     # loop through points
@@ -106,14 +112,16 @@ loadSMOSTimeserie <- function(path){
     k <- 1
     for (i in 1:111){
       for (j in 1:111){
-        tmp1[j,i] <- Soil_moisture_A[mask[1,k],mask[2,k]]
-        tmp2[j,i] <- Soil_moisture_D[mask[1,k],mask[2,k]]
-        tmp3[j,i] <- SM_dqx_A[mask[1,k],mask[2,k]]
-        tmp4[j,i] <- SM_dqx_D[mask[1,k],mask[2,k]]
-        tmp5[j,i] <- sci_flag_A[mask[1,k],mask[2,k]]
-        tmp6[j,i] <- sci_flag_D[mask[1,k],mask[2,k]]
-        tmp7[j,i] <- event_flag_A[mask[1,k],mask[2,k]]
-        tmp8[j,i] <- event_flag_D[mask[1,k],mask[2,k]]
+        tmp1[j,i]  <- Soil_moisture_A[mask[1,k],mask[2,k]]
+        tmp2[j,i]  <- Soil_moisture_D[mask[1,k],mask[2,k]]
+        tmp3[j,i]  <- SM_dqx_A[mask[1,k],mask[2,k]]
+        tmp4[j,i]  <- SM_dqx_D[mask[1,k],mask[2,k]]
+        tmp5[j,i]  <- sci_flag_A[mask[1,k],mask[2,k]]
+        tmp6[j,i]  <- sci_flag_D[mask[1,k],mask[2,k]]
+        tmp7[j,i]  <- event_flag_A[mask[1,k],mask[2,k]]
+        tmp8[j,i]  <- event_flag_D[mask[1,k],mask[2,k]]
+        tmp9[j,i]  <- rfip_A[mask[1,k],mask[2,k]]
+        tmp10[j,i] <- rfip_D[mask[1,k],mask[2,k]]
         k <- k+1
       }
     }
@@ -131,17 +139,20 @@ loadSMOSTimeserie <- function(path){
     
     print(date)
   
-    time[itime]   <- as.character(tstr6)  
-    time[itime+1] <- as.character(tstr18)   
-    sm[,,itime]   <- tmp1 
-    sm[,,itime+1] <- tmp2
-    sf[,,itime]   <- tmp5
-    sf[,,itime+1] <- tmp6 
-    dqx[,,itime]  <- tmp3
-    dqx[,,itime+1]<- tmp4
-    ef[,,itime]   <- tmp7
-    ef[,,itime+1] <- tmp8
-  
+    time[itime]     <- as.character(tstr6)  
+    time[itime+1]   <- as.character(tstr18)   
+    sm[,,itime]     <- tmp1 
+    sm[,,itime+1]   <- tmp2
+    sf[,,itime]     <- tmp5
+    sf[,,itime+1]   <- tmp6 
+    dqx[,,itime]    <- tmp3
+    dqx[,,itime+1]  <- tmp4
+    ef[,,itime]     <- tmp7
+    ef[,,itime+1]   <- tmp8
+    rfip[,,itime]   <- tmp9
+    rfip[,,itime+1] <- tmp10  
+
+
     itime <- itime+2
     print("done")
   }
@@ -150,7 +161,8 @@ loadSMOSTimeserie <- function(path){
                 sm=sm, 
                 sm_dqx=dqx,
                 sci_flag=sf,
-                evn_flag=ef ) 
+                evn_flag=ef,
+                rfi_prob=rfip ) 
   return(SMOS)
   
 }
